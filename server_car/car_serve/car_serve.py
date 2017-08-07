@@ -4,6 +4,8 @@
 import tornado.ioloop
 import tornado.web
 
+from socket_car import DriverSocketHandler
+
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -13,6 +15,8 @@ class MainHandler(tornado.web.RequestHandler):
 def make_app():
     return tornado.web.Application([
         (r"/", MainHandler),
+        (r'/control_socket', DriverSocketHandler),
+
     ])
 
 
