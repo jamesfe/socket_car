@@ -20,7 +20,7 @@ class CarServer(Application):
             (r'/control_socket', DriverSocketHandler),
         ]
 
-        super(CarServer, self).__init__(urls, debug=True)
+        super(CarServer, self).__init__(urls, debug=True, autoreload=False)
 
 
 def main():
