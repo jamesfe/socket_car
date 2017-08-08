@@ -2,13 +2,14 @@
 
 from tornado.testing import AsyncHTTPTestCase
 
-from car_serve import car_serve
+from car_serve.car_serve import CarServer
 
 
 class TestMainServer(AsyncHTTPTestCase):
 
     def get_app(self):
-        return car_serve.make_app()
+        self.test_app = CarServer(ioloop=self.io_loop)
+        return self.test_app
 
     def test_homepage(self):
         response = self.fetch('/')

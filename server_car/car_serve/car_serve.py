@@ -1,26 +1,44 @@
 # -*- coding: utf-8 -*-
 """The main entry point for our little car. """
 
-import tornado.ioloop
-import tornado.web
+import sys
 
-from socket_car import DriverSocketHandler
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+from tornado.web import Application
 
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.write("Hello, world")
-
-
-def make_app():
-    return tornado.web.Application([
-        (r"/", MainHandler),
-        (r'/control_socket', DriverSocketHandler),
-
-    ])
+from car_serve.handlers import (
+    DriverSocketHandler,
+    MainHandler
+)
 
 
-if __name__ == "__main__":
-    app = make_app()
-    app.listen(8888)
-    tornado.ioloop.IOLoop.current().start()
+class CarServer(Application):
+    def __init__(self, ioloop=None):
+        urls = [
+            (r"/", MainHandler),
+            (r'/control_socket', DriverSocketHandler),
+        ]
+
+        super(CarServer, self).__init__(urls, debug=True)
+
+
+def main():
+    app = CarServer()
+
+    try:
+        http_server = HTTPServer(app)
+        http_server.listen(8888, address='127.0.0.1')
+        IOLoop.current().start()
+
+    except (SystemExit, KeyboardInterrupt):
+        pass
+
+    http_server.stop()
+
+    IOLoop.current().stop()
+    sys.exit(0)
+
+
+if __name__ == '__main__':
+    main()
