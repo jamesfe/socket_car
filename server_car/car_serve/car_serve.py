@@ -13,12 +13,61 @@ from car_serve.handlers import (
 )
 
 
+class CarState(object):
+    """This manages the car state."""
+
+    def __init__(self):
+        self.forward_servo = 0
+        self.left_motor = 0
+        self.right_motor = 0
+
+    def _inc_motor(self, begin, val):
+        """A helper function we can change later to modify how values are calculated."""
+        return begin + val
+
+    def _dec_motor(self, begin, val):
+        """A helper function we can change later to modify how values are calculated."""
+        return begin - val
+
+    def _zero_left(self):
+        """Zero out the left motor."""
+        self.left = 0
+
+    def _zero_right(self):
+        """Zero out the right motor."""
+        self.right = 0
+
+    def dec_motor(self, choice, val):
+        """Increase based on our helper function."""
+        if choice == 'left':
+            self.left_motor = self._dec_motor(self.left_motor, val)
+        elif choice == 'right':
+            self.right_motor = self._dec_motor(self.right_motor, val)
+        elif choice == 'both':
+            self.left_motor = self._dec_motor(self.left_motor, val)
+            self.right_motor = self._dec_motor(self.right_motor, val)
+
+    def inc_motor(self, choice, val):
+        if choice == 'left':
+            self.left_motor = self._inc_motor(self.left_motor, val)
+        elif choice == 'right':
+            self.right_motor = self._inc_motor(self.right_motor, val)
+        elif choice == 'both':
+            self.left_motor = self._inc_motor(self.left_motor, val)
+            self.right_motor = self._inc_motor(self.right_motor, val)
+
+    def zero_both_motors(self):
+        self._zero_left()
+        self._zero_right()
+
+
 class CarServer(Application):
     def __init__(self, ioloop=None):
         urls = [
             (r"/", MainHandler),
             (r'/control_socket', DriverSocketHandler),
         ]
+        self.car_state = CarState()
 
         super(CarServer, self).__init__(urls, debug=True, autoreload=False)
 
