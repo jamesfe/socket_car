@@ -16,8 +16,12 @@ from car_serve.handlers import (
 class CarState(object):
     """This manages the car state."""
 
+    def print_state(self):
+        """Mostly a debug function."""
+        print('{} {} {}'.format(self.steering_servo, self.left_motor, self.right_motor))
+
     def __init__(self):
-        self.forward_servo = 0
+        self.steering_servo = 0
         self.left_motor = 0
         self.right_motor = 0
 
@@ -36,6 +40,12 @@ class CarState(object):
     def _zero_right(self):
         """Zero out the right motor."""
         self.right = 0
+
+    def _zero_steering(self):
+        self.steering_servo = 0
+
+    def zero_steering(self):
+        self._zero_steering()
 
     def dec_motor(self, choice, val):
         """Increase based on our helper function."""
@@ -56,9 +66,25 @@ class CarState(object):
             self.left_motor = self._inc_motor(self.left_motor, val)
             self.right_motor = self._inc_motor(self.right_motor, val)
 
+    def _turn(self, value):
+        """Seemingly stupid, maybe we will have to do something more complex here later."""
+        self.steering_servo += value
+
+    def turn(self, value):
+        """Turn by value: negative is left, positive is right."""
+        self._turn(value)
+
     def zero_both_motors(self):
         self._zero_left()
         self._zero_right()
+
+    def zero_all(self):
+        self.zero_both_motors()
+        self.zero_steering()
+
+    def update_physical_state(self):
+        """Send the right values to the GPIO pins."""
+        pass
 
 
 class CarServer(Application):
