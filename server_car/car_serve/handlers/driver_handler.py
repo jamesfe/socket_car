@@ -52,8 +52,25 @@ class DriverSocketHandler(WebSocketHandler):
             self.application.car_state.turn(val)
         self.write_message(self.get_car_state())
 
-    def handle_speed(message):
-        pass
+    def handle_speed(self, message):
+        if not self.check_required_fields(['value', 'left', 'right'], message):
+            return
+        try:
+            value = int(message.get('value', 0))
+        except ValueError:
+            self.write_error_message('speed value must be an int')
+
+        if value != 0:
+            if message.get('left'):
+                self.application.car_state.inc_motor('left', value)
+            if message.get('right'):
+                self.application.car_state.inc_motor('right', value)
+        self.write_message(self.get_car_state())
+
+    def handle_zero(self, message):
+        """Zero everything out on the car.  Full stop."""
+        self.application.car_state.zero_all()
+        self.write_message(self.get_car_state())
 
     def on_message(self, message):
         json_msg = {}
@@ -71,7 +88,9 @@ class DriverSocketHandler(WebSocketHandler):
         if purpose == 'turn':
             self.handle_turns(json_msg)
         elif purpose == 'speed':
-            self.handle_speed(message)
+            self.handle_speed(json_msg)
+        elif purpose == 'zero':
+            self.handle_zero(json_msg)
 
     def on_close(self):
         pass

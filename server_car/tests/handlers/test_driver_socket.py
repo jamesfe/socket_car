@@ -72,15 +72,40 @@ class TestDriverSocket(AsyncHTTPTestCase):
 
     @gen_test
     def test_zero_all_stops_everything(self):
-        pass
+        zero_message = {
+            'purpose': 'zero'
+        }
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        ws.write_message(json.dumps(zero_message))
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        car_state = self.test_app.car_state
+        self.assertEqual(car_state.left_motor, 0)
+        self.assertEqual(car_state.right_motor, 0)
 
     @gen_test
     def test_inc_speed_increases_speed(self):
-        pass
-
-    @gen_test
-    def test_dec_speed_decreases_speed(self):
-        pass
+        speed_inc_message = {
+            'purpose': 'speed',
+            'value': -10,
+            'left': True,
+            'right': False
+        }
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        ws.write_message(json.dumps(speed_inc_message))
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        car_state = self.test_app.car_state
+        self.assertEqual(car_state.left_motor, -10)
+        self.assertEqual(car_state.right_motor, 0)
 
     @gen_test
     def test_stop_does_stop_car(self):
