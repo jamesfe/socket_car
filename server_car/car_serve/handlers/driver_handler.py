@@ -7,6 +7,17 @@ from tornado.websocket import WebSocketHandler
 
 class DriverSocketHandler(WebSocketHandler):
 
+    def check_required_fields(self, fields, message):
+        missing_fields = []
+        for field in fields:
+            if field not in message:
+                missing_fields.append(field)
+        if len(missing_fields) != 0:
+            # TODO: LOG ERROR
+            self.write_error_message('missing fields: {}'.format(missing_fields))
+            return False
+        return True
+
     def open(self):
         pass
 
@@ -22,15 +33,9 @@ class DriverSocketHandler(WebSocketHandler):
         return {'alive': True}
 
     def handle_turns(self, message):
-        required_fields = ['value', 'direction']
-        missing_fields = []
-        for field in required_fields:
-            if field not in message:
-                missing_fields.append(field)
-        if len(missing_fields) != 0:
-            # TODO: LOG ERROR
-            self.write_error_message('missing fields: {}'.format(missing_fields))
-            return False
+        if not self.check_required_fields(['value', 'direction'], message):
+            # If we return false, junk it.
+            return
 
         # Check direction
         if message['direction'] not in ['left', 'right']:
