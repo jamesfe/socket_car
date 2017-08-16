@@ -29,10 +29,6 @@ class CarState(object):
         """A helper function we can change later to modify how values are calculated."""
         return begin + val
 
-    def _dec_motor(self, begin, val):
-        """A helper function we can change later to modify how values are calculated."""
-        return begin - val
-
     def _zero_left(self):
         """Zero out the left motor."""
         self.left = 0
@@ -46,16 +42,6 @@ class CarState(object):
 
     def zero_steering(self):
         self._zero_steering()
-
-    def dec_motor(self, choice, val):
-        """Increase based on our helper function."""
-        if choice == 'left':
-            self.left_motor = self._dec_motor(self.left_motor, val)
-        elif choice == 'right':
-            self.right_motor = self._dec_motor(self.right_motor, val)
-        elif choice == 'both':
-            self.left_motor = self._dec_motor(self.left_motor, val)
-            self.right_motor = self._dec_motor(self.right_motor, val)
 
     def inc_motor(self, choice, val):
         if choice == 'left':
