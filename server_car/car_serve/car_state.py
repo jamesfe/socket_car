@@ -58,7 +58,7 @@ class CarState(object):
 
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
-        pass
+        print('Updating physical state')
 
     def health_check(self):
         return {

@@ -31,8 +31,9 @@ def main():
     try:
         http_server = HTTPServer(app)
         http_server.listen(8888, address='127.0.0.1')
+        IOLoop.current().add_callback(app.car_state.update_physical_state)
+        # http://www.tornadoweb.org/en/stable/ioloop.html#tornado.ioloop.PeriodicCallback
         IOLoop.current().start()
-
     except (SystemExit, KeyboardInterrupt):
         pass
 
