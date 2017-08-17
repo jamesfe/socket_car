@@ -31,11 +31,11 @@ class CarState(object):
 
     def _zero_left(self):
         """Zero out the left motor."""
-        self.left = 0
+        self.left_motor = 0
 
     def _zero_right(self):
         """Zero out the right motor."""
-        self.right = 0
+        self.right_motor = 0
 
     def _zero_steering(self):
         self.steering_servo = 0

@@ -8,6 +8,28 @@ from tornado.websocket import websocket_connect
 from car_serve.car_serve import CarServer
 
 
+turn_message = {
+    'purpose': 'turn',
+    'value': 5,
+    'direction': 'left'
+}
+
+zero_message = {
+    'purpose': 'zero'
+}
+
+stop_message = {
+    'purpose': 'stop'
+}
+
+speed_inc_message = {
+    'purpose': 'speed',
+    'value': -10,
+    'left': True,
+    'right': False
+}
+
+
 class TestDriverSocket(AsyncHTTPTestCase):
     """Tests for badly formed messages."""
 
@@ -54,11 +76,6 @@ class TestDriverSocket(AsyncHTTPTestCase):
 
     @gen_test
     def test_turning_turns_the_vehicle(self):
-        turn_message = {
-            'purpose': 'turn',
-            'value': 5,
-            'direction': 'left'
-        }
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
@@ -72,9 +89,6 @@ class TestDriverSocket(AsyncHTTPTestCase):
 
     @gen_test
     def test_zero_all_stops_everything(self):
-        zero_message = {
-            'purpose': 'zero'
-        }
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
@@ -89,12 +103,6 @@ class TestDriverSocket(AsyncHTTPTestCase):
 
     @gen_test
     def test_inc_speed_increases_speed(self):
-        speed_inc_message = {
-            'purpose': 'speed',
-            'value': -10,
-            'left': True,
-            'right': False
-        }
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
@@ -109,4 +117,26 @@ class TestDriverSocket(AsyncHTTPTestCase):
 
     @gen_test
     def test_stop_does_stop_car(self):
-        pass
+        self.test_app.car_state.zero_all()
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+
+        ws.write_message(json.dumps(speed_inc_message))
+        response = yield ws.read_message()
+
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        car_state = self.test_app.car_state
+        self.assertEqual(car_state.left_motor, -10)
+        self.assertEqual(car_state.right_motor, 0)
+
+        ws.write_message(json.dumps(stop_message))
+        response = yield ws.read_message()
+
+        self.assertIsInstance(res, dict)
+        car_state = self.test_app.car_state
+        self.assertEqual(car_state.left_motor, 0)
+        self.assertEqual(car_state.right_motor, 0)
+        self.test_app.car_state.zero_all()

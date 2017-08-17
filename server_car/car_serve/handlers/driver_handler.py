@@ -72,6 +72,11 @@ class DriverSocketHandler(WebSocketHandler):
         self.application.car_state.zero_all()
         self.write_message(self.get_car_state())
 
+    def handle_stop(self, message):
+        """Stop the car but leave the servo in place."""
+        self.application.car_state.zero_both_motors()
+        self.write_message(self.get_car_state())
+
     def on_message(self, message):
         json_msg = {}
         try:
@@ -91,6 +96,8 @@ class DriverSocketHandler(WebSocketHandler):
             self.handle_speed(json_msg)
         elif purpose == 'zero':
             self.handle_zero(json_msg)
+        elif purpose == 'stop':
+            self.handle_stop(json_msg)
 
     def on_close(self):
         pass
