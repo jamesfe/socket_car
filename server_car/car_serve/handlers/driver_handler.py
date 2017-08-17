@@ -30,7 +30,7 @@ class DriverSocketHandler(WebSocketHandler):
         self.write_message(json_message)
 
     def get_car_state(self):
-        return {'alive': True}
+        return self.application.car_state.health_check()
 
     def handle_turns(self, message):
         if not self.check_required_fields(['value', 'direction'], message):
