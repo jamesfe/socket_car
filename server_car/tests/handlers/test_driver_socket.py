@@ -8,26 +8,33 @@ from tornado.websocket import websocket_connect
 from car_serve.car_serve import CarServer
 
 
-turn_message = {
-    'purpose': 'turn',
-    'value': 5,
-    'direction': 'left'
-}
+def generate_turn_message(val, direction):
+    return json.dumps({
+        'purpose': 'turn',
+        'value': val,
+        'direction': direction
+    })
 
-zero_message = {
-    'purpose': 'zero'
-}
 
-stop_message = {
-    'purpose': 'stop'
-}
+def generate_zero_message():
+    return json.dumps({
+        'purpose': 'zero'
+    })
 
-speed_inc_message = {
-    'purpose': 'speed',
-    'value': -10,
-    'left': True,
-    'right': False
-}
+
+def generate_stop_message():
+    return json.dumps({
+        'purpose': 'stop'
+    })
+
+
+def generate_speed_inc_message(val, left=False, right=False):
+    return json.dumps({
+        'purpose': 'speed',
+        'value': val,
+        'left': left,
+        'right': right
+    })
 
 
 class TestDriverSocket(AsyncHTTPTestCase):
@@ -79,7 +86,7 @@ class TestDriverSocket(AsyncHTTPTestCase):
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
-        ws.write_message(json.dumps(turn_message))
+        ws.write_message(generate_turn_message(5, 'left'))
         response = yield ws.read_message()
         self.assertIsNotNone(response)
         res = json.loads(response)
@@ -92,7 +99,7 @@ class TestDriverSocket(AsyncHTTPTestCase):
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
-        ws.write_message(json.dumps(zero_message))
+        ws.write_message(generate_zero_message())
         response = yield ws.read_message()
         self.assertIsNotNone(response)
         res = json.loads(response)
@@ -106,7 +113,7 @@ class TestDriverSocket(AsyncHTTPTestCase):
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
-        ws.write_message(json.dumps(speed_inc_message))
+        ws.write_message(generate_speed_inc_message(-10, left=True))
         response = yield ws.read_message()
         self.assertIsNotNone(response)
         res = json.loads(response)
@@ -122,7 +129,7 @@ class TestDriverSocket(AsyncHTTPTestCase):
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
 
-        ws.write_message(json.dumps(speed_inc_message))
+        ws.write_message(generate_speed_inc_message(-10, left=True))
         response = yield ws.read_message()
 
         self.assertIsNotNone(response)
@@ -132,7 +139,7 @@ class TestDriverSocket(AsyncHTTPTestCase):
         self.assertEqual(car_state.left_motor, -10)
         self.assertEqual(car_state.right_motor, 0)
 
-        ws.write_message(json.dumps(stop_message))
+        ws.write_message(generate_stop_message())
         response = yield ws.read_message()
 
         self.assertIsInstance(res, dict)
