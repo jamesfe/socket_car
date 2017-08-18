@@ -10,3 +10,7 @@ setuppython:
 .ONESHELL .PHONY : test
 test:
 	../localenv/bin/python3 -m unittest discover -v
+
+.PHONY: run
+run:
+	python3 -m car_serve.car_serve
