@@ -12,6 +12,7 @@ class CarState(object):
         self.steering_servo = 0
         self.left_motor = 0
         self.right_motor = 0
+        self.update_ms = 1000
 
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""
@@ -58,7 +59,7 @@ class CarState(object):
 
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
-        print('Updating physical state')
+        pass
 
     def health_check(self):
         return {

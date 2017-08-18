@@ -4,7 +4,7 @@
 import sys
 
 from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
+from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import Application
 
 from car_serve.car_state import CarState
@@ -31,8 +31,8 @@ def main():
     try:
         http_server = HTTPServer(app)
         http_server.listen(8888, address='127.0.0.1')
-        IOLoop.current().add_callback(app.car_state.update_physical_state)
-        # http://www.tornadoweb.org/en/stable/ioloop.html#tornado.ioloop.PeriodicCallback
+        i = PeriodicCallback(app.car_state.update_physical_state, app.car_state.update_ms)
+        i.start()
         IOLoop.current().start()
     except (SystemExit, KeyboardInterrupt):
         pass
