@@ -1,0 +1,11 @@
+{
+    "logging": {
+        "log_dir": "./logs/",
+        "max_prev_states": 2000
+    },
+    "car_state": {
+        "update_ms" {
+            "10"
+        }
+    }
+}
