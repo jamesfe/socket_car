@@ -32,10 +32,6 @@ class CarServer(Application):
 
         self.log_dir = './logs/'
 
-        # Previous states are a rotating number of states
-        self.num_prev_states = 2000
-        self.previous_states = []
-
         # Previous commands are going to be dumped to a file
         now = dt.datetime.fromtimestamp(time.time())
         command_log_name = 'command_log_{}.log'.format(now.strftime("%Y_%m_%d_%H%M%S"))

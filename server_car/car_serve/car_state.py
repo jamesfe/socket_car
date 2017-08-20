@@ -25,6 +25,9 @@ class CarState(object):
         self.left_motor = 0
         self.right_motor = 0
         self.update_ms = 1000
+        # Previous states are a rotating number of states
+        self.num_prev_states = 2000
+        self.previous_states = []
 
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""
@@ -71,7 +74,10 @@ class CarState(object):
 
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
-        pass
+        self.previous_states.append(self.health_check())
+        if len(self.previous_states) > self.max_prev_states:
+            delta = len(self.previous_states) - self.max_prev_states
+            self.previous_states = self.previous_states[delta:]
 
     def health_check(self):
         return {
