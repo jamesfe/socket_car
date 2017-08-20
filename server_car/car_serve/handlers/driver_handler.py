@@ -7,14 +7,16 @@ from tornado.websocket import WebSocketHandler
 
 class DriverSocketHandler(WebSocketHandler):
 
+    def lazy_write_message(self, msg):
+        self.write_message(json.dumps(msg))
+
     def check_required_fields(self, fields, message):
         missing_fields = []
         for field in fields:
             if field not in message:
                 missing_fields.append(field)
         if len(missing_fields) != 0:
-            # TODO: LOG ERROR
-            self.write_error_message('missing fields: {}'.format(missing_fields))
+            self.write_error_message('Missing fields: {}'.format(missing_fields))
             return False
         return True
 
@@ -26,8 +28,8 @@ class DriverSocketHandler(WebSocketHandler):
             'type': 'error',
             'message': msg
         }
-        json_message = json.dumps(message)
-        self.write_message(json_message)
+        self.application.log.error(msg)
+        self.lazy_write_message(message)
 
     def get_car_state(self):
         return self.application.car_state.health_check()
@@ -82,10 +84,8 @@ class DriverSocketHandler(WebSocketHandler):
         try:
             json_msg = json.loads(message)
         except ValueError:
-            # TODO: LOG ERROR
             self.write_error_message('not json')
         if 'purpose' not in json_msg:
-            # TODO: LOG ERROR
             self.write_error_message('no purpose')
             return None
         purpose = json_msg['purpose']

@@ -1,4 +1,15 @@
 # -*- coding: utf-8 -*-
+"""A class that controls the physical state of the car.  The car's physical state is updated by the
+    `update_physical_state` function: this is called by the parent server every `update_ms` milliseconds."""
+
+
+import logging
+
+import coloredlogs
+
+
+logger = logging.getLogger('car_state')
+coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DEBUG', logger=logger)
 
 
 class CarState(object):
@@ -6,7 +17,8 @@ class CarState(object):
 
     def print_state(self):
         """Mostly a debug function."""
-        print('{} {} {}'.format(self.steering_servo, self.left_motor, self.right_motor))
+        out_string = '{} {} {}'.format(self.steering_servo, self.left_motor, self.right_motor)
+        logger.info(out_string)
 
     def __init__(self):
         self.steering_servo = 0
