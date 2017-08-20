@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """The main entry point for our little car. """
 
+import datetime as dt
 import logging
+import os
 import sys
+import time
 
 import coloredlogs
 from tornado.httpserver import HTTPServer
@@ -26,6 +29,19 @@ class CarServer(Application):
             (r'/control_socket', DriverSocketHandler),
         ]
         self.car_state = CarState()
+
+        self.log_dir = './logs/'
+
+        # Previous states are a rotating number of states
+        self.num_prev_states = 2000
+        self.previous_states = []
+
+        # Previous commands are going to be dumped to a file
+        now = dt.datetime.fromtimestamp(time.time())
+        command_log_name = 'command_log_{}.log'.format(now.strftime("%Y_%m_%d_%H%M%S"))
+        self.command_log = open(os.path.join(self.log_dir, command_log_name), 'w')
+        self.command_log.write('Command received')
+
         self.log = logger
 
         super(CarServer, self).__init__(urls, debug=True, autoreload=False)
