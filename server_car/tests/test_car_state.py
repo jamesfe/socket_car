@@ -2,13 +2,15 @@
 
 import unittest
 
-from socket_car import car_state
+from car_serve import car_state
 
 
 class TestCarState(unittest.TestCase):
 
     def test_max_intervals(self):
         a = car_state.CarState()
-        # Set max items
-        # Run a few updates
-        # Check length of telemetry
+        a.max_prev_states = 5
+        self.assertEqual(len(a.previous_states), 0)
+        for i in range(10):
+            a.update_physical_state()
+        self.assertEqual(len(a.previous_states), 5)
