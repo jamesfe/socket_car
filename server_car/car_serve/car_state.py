@@ -4,6 +4,7 @@
 
 
 import logging
+import time
 
 import coloredlogs
 
@@ -74,7 +75,11 @@ class CarState(object):
 
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
-        self.previous_states.append(self.health_check())
+        history_unit = {
+            'time': time.time(),
+            'health_check': self.health_check()
+        }
+        self.previous_states.append(history_unit)
         if len(self.previous_states) > self.max_prev_states:
             delta = len(self.previous_states) - self.max_prev_states
             self.previous_states = self.previous_states[delta:]

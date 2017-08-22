@@ -15,7 +15,8 @@ from tornado.web import Application
 from car_serve.car_state import CarState
 from car_serve.handlers import (
     DriverSocketHandler,
-    MainHandler
+    MainHandler,
+    HistoryHandler
 )
 
 logger = logging.getLogger('car_server')
@@ -25,8 +26,9 @@ coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DE
 class CarServer(Application):
     def __init__(self, ioloop=None):
         urls = [
-            (r"/", MainHandler),
+            (r'/', MainHandler),
             (r'/control_socket', DriverSocketHandler),
+            (r'/history', HistoryHandler)
         ]
         self.car_state = CarState()
 
