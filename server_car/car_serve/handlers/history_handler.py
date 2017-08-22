@@ -15,3 +15,4 @@ class HistoryHandler(RequestHandler):
             'states': history
         }
         self.write(json.dumps(message))
+        self.finish()
