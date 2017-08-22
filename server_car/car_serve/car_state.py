@@ -26,7 +26,7 @@ class CarState(object):
         self.right_motor = 0
         self.update_ms = 1000
         # Previous states are a rotating number of states
-        self.num_prev_states = 2000
+        self.max_prev_states = 2000
         self.previous_states = []
 
     def _inc_motor(self, begin, val):
