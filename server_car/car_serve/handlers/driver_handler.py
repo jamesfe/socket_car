@@ -80,6 +80,7 @@ class DriverSocketHandler(WebSocketHandler):
         self.write_message(self.get_car_state())
 
     def on_message(self, message):
+        self.application.internal_log(message)
         json_msg = {}
         try:
             json_msg = json.loads(message)

@@ -24,6 +24,10 @@ coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DE
 
 
 class CarServer(Application):
+
+    def internal_log(self, msg):
+        self.command_log.write(msg)
+
     def __init__(self, ioloop=None):
         urls = [
             (r'/', MainHandler),
@@ -38,7 +42,7 @@ class CarServer(Application):
         now = dt.datetime.fromtimestamp(time.time())
         command_log_name = 'command_log_{}.log'.format(now.strftime("%Y_%m_%d_%H%M%S"))
         self.command_log = open(os.path.join(self.log_dir, command_log_name), 'w')
-        self.command_log.write('Command received')
+        self.internal_log('Command received')
 
         self.log = logger
 
