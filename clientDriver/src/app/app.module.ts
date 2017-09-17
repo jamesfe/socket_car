@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
+import { ControlStickComponent } from './control-stick/control-stick.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ControlStickComponent
   ],
   imports: [
     BrowserModule,
