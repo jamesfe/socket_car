@@ -4,23 +4,21 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
-import { APP_ROUTING } from './app.routing';
-
-import { HomeComponent } from './route/home/home.component';
+import { ControlStickComponent } from './control-stick/control-stick.component';
 
 @NgModule({
     imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
-        APP_ROUTING
+        HttpModule
     ],
     declarations: [
         AppComponent,
-        HomeComponent
+        ControlStickComponent
     ],
     bootstrap: [
         AppComponent
     ]
 })
+
 export class AppModule {}
