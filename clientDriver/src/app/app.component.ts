@@ -3,12 +3,7 @@ import { Component, OnInit } from "@angular/core";
 @Component({
     selector: "socketcar",
     styleUrls: [ "./app.component.scss" ],
-    template: `
-        <div>
-        <h1>Socket Car Controller</h1>
-        <controlstick></controlstick>
-        </div>
-    `
+    templateUrl: "./app.component.html"
 })
 
 export class AppComponent implements OnInit {
