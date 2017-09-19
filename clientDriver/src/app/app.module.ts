@@ -4,7 +4,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
-import { ControlStickComponent } from './control-stick/control-stick.component';
+import { ControlStickComponent } from './components/controlstick.component';
+import { ServerTrafficComponent } from './components/servertraffic.component';
 
 @NgModule({
     imports: [
@@ -14,11 +15,16 @@ import { ControlStickComponent } from './control-stick/control-stick.component';
     ],
     declarations: [
         AppComponent,
-        ControlStickComponent
+        ControlStickComponent,
+        ServerTrafficComponent
     ],
     bootstrap: [
         AppComponent
     ]
 })
 
-export class AppModule {}
+export class AppModule {
+
+
+}
+
