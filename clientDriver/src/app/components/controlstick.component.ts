@@ -10,8 +10,9 @@ export class ControlStickComponent {
 
   constructor() { }
 
-  zeroClick():any {
-    console.log("zero click");
+  clickAction(action: string) {
+    console.log(action);
   }
+
 
 }

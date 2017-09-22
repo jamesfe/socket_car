@@ -1,6 +1,14 @@
 <div>
-<span><button name="zero" (click)="zeroClick();">Zero</button></span>
-<span><button>Stop</button></span>
-<button>Inc Speed</button><button>Dec Speed</button>
-<span><button>Wheels Left</button><button>Wheels Right</button></span>
-</div>
+        <button (click)="clickAction('zero')">Zero</button>
+        <button (click)="clickAction('stop')">Stop</button>
+    </div>
+    <div>
+        <div>
+            <button (click)="clickAction('incspeed')">Inc Speed</button>
+            <button (click)="clickAction('decspeed')">Dec Speed</button>
+        </div>
+        <div>
+            <button (click)="clickAction('left')">Wheels Left</button>
+            <button (click)="clickAction('right')">Wheels Right</button>
+        </div>
+    </div>
