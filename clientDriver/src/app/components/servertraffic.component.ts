@@ -11,10 +11,6 @@ import { Component } from '@angular/core';
 })
 
 export class ServerTrafficComponent {
-
-  constructor() { 
-    console.log("fuck");
-
+  constructor() {
   }
-
 }
