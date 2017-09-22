@@ -8,3 +8,13 @@
     height: 300px;
     align-items: stretch;
 }
+
+.input-area {
+    flex-grow: 1;
+    background-color: #E09A9A;
+}
+
+.output-area {
+    flex-grow: 1;
+    background-color: #7AA1EB;
+}
