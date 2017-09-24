@@ -21,6 +21,7 @@ class DriverSocketHandler(WebSocketHandler):
         return True
 
     def open(self):
+        self.application.log.info('New websocket!')
         pass
 
     def write_error_message(self, msg):
@@ -81,6 +82,7 @@ class DriverSocketHandler(WebSocketHandler):
 
     def on_message(self, message):
         self.application.internal_log(message)
+        self.application.log.info('Received message')
         json_msg = {}
         try:
             json_msg = json.loads(message)

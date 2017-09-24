@@ -54,14 +54,17 @@ def main():
     app = CarServer()
 
     try:
+        logger.info('Opening HTTP server.')
         http_server = HTTPServer(app)
-        http_server.listen(8888, address='127.0.0.1')
+        http_server.listen(9001, address='127.0.0.1')
+        logger.debug('Registering periodic callback.')
         i = PeriodicCallback(app.car_state.update_physical_state, app.car_state.update_ms)
         i.start()
         IOLoop.current().start()
     except (SystemExit, KeyboardInterrupt):
         pass
 
+    logger.info('Stopping server.')
     http_server.stop()
 
     IOLoop.current().stop()
