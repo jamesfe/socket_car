@@ -7,6 +7,9 @@ from tornado.websocket import WebSocketHandler
 
 class DriverSocketHandler(WebSocketHandler):
 
+    def check_origin(self, origin):
+        return True
+
     def lazy_write_message(self, msg):
         self.write_message(json.dumps(msg))
 
