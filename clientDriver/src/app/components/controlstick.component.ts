@@ -9,11 +9,16 @@ import { SocketService } from '../services/serversocket.service';
 
 export class ControlStickComponent {
 
+  private message = {
+		purpose : 'turn',
+		message: ''
+	};
+
   constructor(private socketService: SocketService) { }
 
   clickAction(action: string) {
     console.log("Sending...");
-    this.socketService.sendGenMessage({body: "blah"});
+    var a = this.socketService.messages.next(this.message);
     console.log(action);
   }
 }
