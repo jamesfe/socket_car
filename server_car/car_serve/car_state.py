@@ -5,6 +5,11 @@
 
 import logging
 import time
+try:
+    from dual_mc33926_rpi import motors, MAX_SPEED
+except ImportError:
+    MAX_SPEED = 480
+    print('Could not import PWM library')
 
 import coloredlogs
 
@@ -32,6 +37,10 @@ class CarState(object):
 
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""
+        if (begin + val) > self._MAX_SPEED:
+            return self._MAX_SPEED
+        elif (begin + val) < self._MIN_SPEED:
+            return self._MIN_SPEED
         return begin + val
 
     def _zero_left(self):
@@ -49,6 +58,7 @@ class CarState(object):
         self._zero_steering()
 
     def inc_motor(self, choice, val):
+        """Increment the motor; but I think we can send a negative val and slow down. I hope."""
         if choice == 'left':
             self.left_motor = self._inc_motor(self.left_motor, val)
         elif choice == 'right':
@@ -73,8 +83,16 @@ class CarState(object):
         self.zero_both_motors()
         self.zero_steering()
 
+    def initialize_state(self):
+        self._not_initialized = False
+        self.MAX_SPEED = MAX_SPEED
+        self._MIN_SPEED = self._MAX_SPEED * -1
+        motors.enable()
+        motors.setSpeeds(0, 0)
+
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
+        # Do some note taking
         history_unit = {
             'time': time.time(),
             'health_check': self.health_check()
@@ -83,6 +101,12 @@ class CarState(object):
         if len(self.previous_states) > self.max_prev_states:
             delta = len(self.previous_states) - self.max_prev_states
             self.previous_states = self.previous_states[delta:]
+
+        # Do the actual initialization
+        if self._not_initialized:
+            self.initialize_state()
+        motors.motor1.setSpeed(self.left_motor)
+        motors.motor2.setSpeed(self.right_motor)
 
     def health_check(self):
         return {
