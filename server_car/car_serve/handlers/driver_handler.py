@@ -11,6 +11,7 @@ class DriverSocketHandler(WebSocketHandler):
         return True
 
     def lazy_write_message(self, msg):
+        print('writing back')
         self.write_message(json.dumps(msg))
 
     def check_required_fields(self, fields, message):
@@ -86,6 +87,7 @@ class DriverSocketHandler(WebSocketHandler):
     def on_message(self, message):
         self.application.internal_log(message)
         self.application.log.info('Received message')
+        print(message)
         json_msg = {}
         try:
             json_msg = json.loads(message)
@@ -104,6 +106,8 @@ class DriverSocketHandler(WebSocketHandler):
             self.handle_zero(json_msg)
         elif purpose == 'stop':
             self.handle_stop(json_msg)
+        else:
+            self.write_error_message('not handled')
 
     def on_close(self):
         pass

@@ -9,11 +9,13 @@ import 'rxjs/add/observable/dom/webSocket';
 const DRIVER_URL = 'ws://localhost:9001/control_socket';
 
 export interface Message {
-    action: string,
+    purpose: string,
 	direction?: string,
     value?: number,
     left?: boolean,
-    right?: boolean
+    right?: boolean,
+    message?: string,
+    type?: string
 }
 
 Injectable()
@@ -25,12 +27,15 @@ export class SocketService {
         this.messages = <Subject<Message>>this.connect()
             .map((response: MessageEvent): Message => {
                 let data = JSON.parse(response.data);
+                console.log("received or sent a message");
                 return {
-                    action : data.action,
+                    purpose : data.purpose,
                     direction: data.direction,
                     value: data.value,
                     left: data.left,
                     right: data.right,
+                    message: data.message,
+                    type: data.type
                 }
             });
     }

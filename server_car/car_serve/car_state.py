@@ -9,6 +9,7 @@ try:
     from dual_mc33926_rpi import motors, MAX_SPEED
 except ImportError:
     MAX_SPEED = 480
+    NO_PWM = True
     print('Could not import PWM library')
 
 import coloredlogs
@@ -27,6 +28,7 @@ class CarState(object):
         logger.info(out_string)
 
     def __init__(self):
+        self._not_initialized = True
         self.steering_servo = 0
         self.left_motor = 0
         self.right_motor = 0
@@ -85,10 +87,11 @@ class CarState(object):
 
     def initialize_state(self):
         self._not_initialized = False
-        self.MAX_SPEED = MAX_SPEED
+        self._MAX_SPEED = MAX_SPEED
         self._MIN_SPEED = self._MAX_SPEED * -1
-        motors.enable()
-        motors.setSpeeds(0, 0)
+        if not NO_PWM:
+            motors.enable()
+            motors.setSpeeds(0, 0)
 
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
@@ -105,8 +108,9 @@ class CarState(object):
         # Do the actual initialization
         if self._not_initialized:
             self.initialize_state()
-        motors.motor1.setSpeed(self.left_motor)
-        motors.motor2.setSpeed(self.right_motor)
+        if not NO_PWM:
+            motors.motor1.setSpeed(self.left_motor)
+            motors.motor2.setSpeed(self.right_motor)
 
     def health_check(self):
         return {
