@@ -114,7 +114,10 @@ class CarState(object):
 
     def health_check(self):
         return {
-            'steering': self.steering_servo,
-            'left_motor': self.left_motor,
-            'right_motor': self.right_motor
+            'time': time.time(),
+            'health_check': {
+                'steering': self.steering_servo,
+                'left_motor': self.left_motor,
+                'right_motor': self.right_motor
+            }
         }

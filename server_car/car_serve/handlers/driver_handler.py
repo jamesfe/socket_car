@@ -59,6 +59,7 @@ class DriverSocketHandler(WebSocketHandler):
             self.application.car_state.turn(-1 * val)
         elif message['direction'] == 'right':
             self.application.car_state.turn(val)
+        self.application.log.debug('sending turn health check')
         self.write_message(self.get_car_state())
 
     def handle_speed(self, message):

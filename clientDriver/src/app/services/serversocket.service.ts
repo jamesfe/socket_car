@@ -15,7 +15,9 @@ export interface Message {
     left?: boolean,
     right?: boolean,
     message?: string,
-    type?: string
+    type?: string,
+    time?: number,
+    health_check?: any
 }
 
 Injectable()
@@ -28,17 +30,21 @@ export class SocketService {
     constructor() {
         this.messages = <Subject<Message>>this.connect()
             .map((response: MessageEvent): Message => {
+                console.log("Raw response data: ", response.data);
                 let data = JSON.parse(response.data);
-                console.log("received or sent a message");
-                return {
+                let p = {
                     purpose : data.purpose,
                     direction: data.direction,
                     value: data.value,
                     left: data.left,
                     right: data.right,
                     message: data.message,
-                    type: data.type
+                    type: data.type,
+                    time: data.time,
+                    health_check: data.health_check
                 }
+                console.log("received a message", p);
+                return p;
             });
     }
 
@@ -108,6 +114,7 @@ export class SocketService {
     let observer = {
         next: (data: Object) => {
             if (ws.readyState === WebSocket.OPEN) {
+                // console.log("Sending some data.", data);
                 ws.send(JSON.stringify(data));
             }
         },
