@@ -11,28 +11,30 @@ export class ControlStickComponent {
   private turnval = 5; // how fast do we turn?
   private speedinc = 5; // how fast do we turn?
 
-  constructor(private socketService: SocketService) { }
+  constructor(private socketService: SocketService) {
+    socketService.messages.subscribe(x => console.log(x));
+  }
 
   clickAction(action: string) {
     var message: Message;
     switch (action) {
-      case "left":
-        message = {action: "turn", direction: "left", value: this.turnval}
+      case "left" || "a":
+        message = {purpose: "turn", direction: "left", value: this.turnval}
         break;
-      case "right":
-        message = {action: "turn", direction: "right", value: this.turnval}
+      case "right" || "d":
+        message = {purpose: "turn", direction: "right", value: this.turnval}
         break;
-      case "incspeed":
-        message = {action: "speed", left: true, right: true, value: this.speedinc}
+      case "incspeed" || "w":
+        message = {purpose: "speed", left: true, right: true, value: this.speedinc}
         break;
-      case "decspeed":
-        message = {action: "speed", left: true, right: true, value: -1 * this.speedinc}
+      case "decspeed" || "s":
+        message = {purpose: "speed", left: true, right: true, value: -1 * this.speedinc}
         break;
-      case "zero":
-        message = {action: "zero"}
+      case "zero" || "z":
+        message = {purpose: "zero"}
         break;
-      case "stop":
-        message = {action: "stop"}
+      case "stop" || "q":
+        message = {purpose: "stop"}
         break;
       default:
         console.log("Did not receive a valid action.");
