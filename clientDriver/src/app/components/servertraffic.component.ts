@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'servertraffic',
+  selector: 'server-traffic',
   styleUrls: ["./servertraffic.component.scss"],
   templateUrl: "./servertraffic.component.html"
 })

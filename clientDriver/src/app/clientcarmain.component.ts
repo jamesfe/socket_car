@@ -5,13 +5,13 @@ import { SocketService, Message } from './services/serversocket.service';
 
 
 @Component({
-    selector: "socketcar",
+    selector: "client-car-main",
     styleUrls: [ "./app.component.scss" ],
     templateUrl: "./app.component.html",
     providers: [ SocketService ]
 })
 
-export class AppComponent implements OnInit {
+export class ClientCarMainComponent implements OnInit {
     private turnval = 5; // how fast do we turn?
     private speedinc = 5; // how fast do we turn?
 

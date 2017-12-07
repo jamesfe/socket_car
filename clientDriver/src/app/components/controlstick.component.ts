@@ -3,7 +3,7 @@ import { SocketService, Message } from '../services/serversocket.service';
 import { Observable } from "rxjs";
 
 @Component({
-  selector: 'controlstick',
+  selector: 'control-stick',
   styleUrls: ["./controlstick.component.scss"],
   templateUrl: "./controlstick.component.html",
 })
