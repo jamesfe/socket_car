@@ -34,7 +34,6 @@ export class AppComponent implements OnInit {
              break;
       }
       console.log("Sending keypress..." + message);
-      var a = this.controlService.messages.next(message);
     }
 
 }
