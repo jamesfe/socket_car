@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import time
 
 from tornado.websocket import WebSocketHandler
 
@@ -11,7 +12,7 @@ class DriverSocketHandler(WebSocketHandler):
         return True
 
     def lazy_write_message(self, msg):
-        print('writing back')
+        self.application.log.debug('Lazy write message called')
         self.write_message(json.dumps(msg))
 
     def check_required_fields(self, fields, message):
@@ -30,6 +31,7 @@ class DriverSocketHandler(WebSocketHandler):
 
     def write_error_message(self, msg):
         message = {
+            'time': time.time(),
             'type': 'error',
             'message': msg
         }
@@ -87,7 +89,8 @@ class DriverSocketHandler(WebSocketHandler):
     def on_message(self, message):
         self.application.internal_log(message)
         self.application.log.info('Received message')
-        print(message)
+        print('hello world')
+        print('Message: \"', message, '\"')
         json_msg = {}
         try:
             json_msg = json.loads(message)

@@ -22,6 +22,8 @@ Injectable()
 export class SocketService {
     // Cheers! From: https://github.com/PeterKassenaar/ng2-websockets/
     public messages: Subject<Message>  = new Subject<Message>();
+    private turnval = 5; // how fast do we turn?
+    private speedinc = 5; // how fast do we turn?
 
     constructor() {
         this.messages = <Subject<Message>>this.connect()
@@ -44,10 +46,53 @@ export class SocketService {
   url: string = DRIVER_URL;
 
   public connect(): Subject<MessageEvent> {
+    console.log("creating a websocket");
     if(!this.socket) {
       this.socket = this.create(this.url);
     }
     return this.socket;
+  }
+
+  public sendMessageBasedOnEvent(event: String) {
+      var message: Message;
+      switch (event) {
+        case "badEvent":
+        case "b":
+          message = {purpose: "blah"}
+          break;
+        case "left":
+        case "a":
+          message = {purpose: "turn", direction: "left", value: this.turnval}
+          break;
+        case "right":
+        case "d":
+          message = {purpose: "turn", direction: "right", value: this.turnval}
+          break;
+        case "incspeed":
+        case "w":
+          message = {purpose: "speed", left: true, right: true, value: this.speedinc}
+          break;
+        case "decspeed":
+        case "s":
+          message = {purpose: "speed", left: true, right: true, value: -1 * this.speedinc}
+          break;
+        case "zero":
+        case "z":
+          message = {purpose: "zero"}
+          break;
+        case "stop":
+        case "q":
+          message = {purpose: "stop"}
+          break;
+        default:
+          console.log("Did not receive a valid action.");
+      }
+      if (message) {
+        console.log("Sending with custom..." + message);
+        this.messages.next(message);
+      } else {
+        console.log("message not valid, did not send.");
+      }
   }
 
   private create(url: string): Subject<MessageEvent> {

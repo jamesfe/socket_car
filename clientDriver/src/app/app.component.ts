@@ -21,19 +21,12 @@ export class AppComponent implements OnInit {
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
-      var message: Message;
-      console.log(event.key);
-      switch(event.key) {
-          case 'a':
-            console.log("faster");
-            message = {purpose: "speed", left: true, right: true, value: this.speedinc};
-            break;
-          case 'z':
-             console.log("erroneous msg");
-             message = {purpose: "zoozie"};
-             break;
-      }
-      console.log("Sending keypress..." + message);
+        /* We capture all the keypresses so the app can control the car when the screen is 
+        in focus. */
+        let validKeys = "basdfqwz";
+        if (validKeys.indexOf(event.key) !== -1) {
+            this.controlService.sendMessageBasedOnEvent(event.key);
+        }
     }
 
 }
