@@ -9,7 +9,7 @@ import { Observable } from "rxjs";
 })
 
 export class ControlStickComponent {
-  public items: String[] = [];
+  public items: Object[] = [];
 
   constructor(private socketService: SocketService) {
     socketService.messages.subscribe(x => this.addItem(x));
@@ -18,7 +18,9 @@ export class ControlStickComponent {
   addItem(item: Message) {
     console.log("storing item", item);
     if (item.type == "error") {
-      let newMessage = item.type + " " + item.message;
+      let newMessage = {
+        "type": item.type,
+        "message": item.message };
       this.items.push(newMessage);
     }
     // TODO: Get template to update.

@@ -14,8 +14,9 @@
     </div>
 </div>
 <h3>messages to server</h3>
-<div>
-    {{items}}
+<div height="50%">
+    <div *ngFor="let msg of items"><b>{{msg.type}}</b>: {{msg.message}}</div>
 </div>
-
+<div>
 <button (click)="clickAction('badEvent')">bad event </button>
+</div>
