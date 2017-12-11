@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SocketService, Message } from '../services/serversocket.service';
+import { SocketService, Message, HealthCheck } from '../services/serversocket.service';
 
 @Component({
   selector: 'server-traffic',
@@ -7,11 +7,26 @@ import { SocketService, Message } from '../services/serversocket.service';
   templateUrl: "./servertraffic.component.html"
 })
 
+
 export class ServerTrafficComponent {
   public items: Object[] = [];
+  public health: HealthCheck = {
+    left_motor: -999,
+    right_motor: -999,
+    steering: -999
+  };
 
   constructor(private socketService: SocketService) {
-    socketService.messages.subscribe(x => this.addItem(x));
+    socketService.messages.subscribe(x => this.handleMessage(x));
+  }
+
+  handleMessage(item: Message) {
+    this.addItem(item);
+    if (item.health_check !== undefined) {
+        this.health.left_motor = item.health_check.left_motor;
+        this.health.right_motor = item.health_check.right_motor;
+        this.health.steering = item.health_check.steering;
+    }
   }
 
   addItem(item: Message) {

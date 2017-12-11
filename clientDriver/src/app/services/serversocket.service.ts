@@ -20,6 +20,12 @@ export interface Message {
     health_check?: any
 }
 
+export interface HealthCheck {
+    left_motor: number,
+    right_motor: number,
+    steering: number
+  }
+
 Injectable()
 export class SocketService {
     // Cheers! From: https://github.com/PeterKassenaar/ng2-websockets/

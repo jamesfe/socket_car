@@ -1,11 +1,28 @@
 @import "../../constants";
 
 .bod {
-    background-color: #A7EB94;
     margin: 20px;
 }
 
 .message-text {
+    border: 2px solid black;
+    padding: 3px;
+    line-height: 2.5ex;
+    height: 50ex;
+    width: 600px;
+    overflow: hidden;
     font-size: 12px;
     font-family: Courier New, Courier, monospace;
+}
+
+.message-text-title {
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid black;
+    padding: 0px 3px 0px 3px;
+}
+
+.status-update {
+    font-size: 24px;
+    font-weight: bold;
 }
