@@ -27,7 +27,16 @@ class CarState(object):
         out_string = '{} {} {}'.format(self.steering_servo, self.left_motor, self.right_motor)
         logger.info(out_string)
 
+    def get_valid_speed(self, value):
+        value = int(value)
+        if value > self._MAX_SPEED:
+            value = self._MAX_SPEED
+        elif value < self._MIN_SPEED:
+            value = self._MIN_SPEED
+        return value
+
     def __init__(self):
+        self.gear_lookup = {}
         self._not_initialized = True
         self.steering_servo = 0
         self.left_motor = 0
@@ -39,11 +48,15 @@ class CarState(object):
 
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""
-        if (begin + val) > self._MAX_SPEED:
-            return self._MAX_SPEED
-        elif (begin + val) < self._MIN_SPEED:
-            return self._MIN_SPEED
-        return begin + val
+        return self.get_valid_speed(begin + val)
+
+    def _set_absolute_left(self, value):
+        """Set the value for the left motor absolutely."""
+        self.left_motor = self.get_valid_speed(value)
+
+    def _set_absolute_right(self, value):
+        """Set the value for the right motor absolutely."""
+        self.right_motor = self.get_valid_speed(value)
 
     def _zero_left(self):
         """Zero out the left motor."""
@@ -58,6 +71,12 @@ class CarState(object):
 
     def zero_steering(self):
         self._zero_steering()
+
+    def shift_gear(self, value):
+        """A shortcut to a given speed so we don't have to accelerate all the time."""
+        speed = self.gear_lookup[value]
+        self._set_absolute_right(speed)
+        self._set_absolute_left(speed)
 
     def inc_motor(self, choice, val):
         """Increment the motor; but I think we can send a negative val and slow down. I hope."""
@@ -89,7 +108,12 @@ class CarState(object):
         self._not_initialized = False
         self._MAX_SPEED = MAX_SPEED
         self._MIN_SPEED = self._MAX_SPEED * -1
-        if not NO_PWM:
+        gears = 5
+        for index in range(1, gears + 1):
+            self.gear_lookup[index] = int((self._MAX_SPEED / gears) * index)
+        logger.info('Setting gears: ' + str(self.gear_lookup))
+
+        if NO_PWM is False:
             motors.enable()
             motors.setSpeeds(0, 0)
 

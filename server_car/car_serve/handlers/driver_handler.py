@@ -87,6 +87,15 @@ class DriverSocketHandler(WebSocketHandler):
         self.application.car_state.zero_both_motors()
         self.write_message(self.get_car_state())
 
+    def handle_shift(self, message):
+        """If we shift to a certain gear, set the car's speed to that gear immediately."""
+        if 'value' not in message:
+            self.write_error_message('must contain a value from 1-6')
+            return None
+        target_gear = int(message['value'])
+        self.application.car_state.shift_gear(target_gear)
+        self.write_message(self.get_car_state())
+
     def on_message(self, message):
         self.application.internal_log(message)
         self.application.log.info('Received message')
@@ -110,6 +119,8 @@ class DriverSocketHandler(WebSocketHandler):
             self.handle_zero(json_msg)
         elif purpose == 'stop':
             self.handle_stop(json_msg)
+        elif purpose == 'shift':
+            self.handle_shift(json_msg)
         else:
             self.write_error_message('not handled')
 
