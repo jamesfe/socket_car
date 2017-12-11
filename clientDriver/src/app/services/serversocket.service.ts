@@ -93,6 +93,12 @@ export class SocketService {
         case "q":
           message = {purpose: "stop"}
           break;
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+            message = {purpose: "shift", value: parseInt(event.toString())}
         default:
           console.log("Did not receive a valid action.");
       }

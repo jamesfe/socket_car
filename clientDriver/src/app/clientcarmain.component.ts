@@ -23,7 +23,7 @@ export class ClientCarMainComponent implements OnInit {
     handleKeyboardEvent(event: KeyboardEvent) {
         /* We capture all the keypresses so the app can control the car when the screen is 
         in focus. */
-        let validKeys = "basdfqwz";
+        let validKeys = "basdfqwz12345";
         if (validKeys.indexOf(event.key) !== -1) {
             this.controlService.sendMessageBasedOnEvent(event.key);
         }
