@@ -1,3 +1,9 @@
 <div class="bod">
 <h1>output things</h1>
+
+<h3>messages from server</h3>
+<div class="message-text">
+    <div *ngFor="let msg of items"><b>{{msg.type}}</b>: {{msg.message}}</div>
+</div>
+
 </div>

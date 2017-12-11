@@ -30,7 +30,6 @@ export class SocketService {
     constructor() {
         this.messages = <Subject<Message>>this.connect()
             .map((response: MessageEvent): Message => {
-                console.log("Raw response data: ", response.data);
                 let data = JSON.parse(response.data);
                 let p = {
                     purpose : data.purpose,
@@ -43,7 +42,6 @@ export class SocketService {
                     time: data.time,
                     health_check: data.health_check
                 }
-                console.log("received a message", p);
                 return p;
             });
     }
@@ -52,7 +50,6 @@ export class SocketService {
   url: string = DRIVER_URL;
 
   public connect(): Subject<MessageEvent> {
-    console.log("creating a websocket");
     if(!this.socket) {
       this.socket = this.create(this.url);
     }
@@ -94,7 +91,6 @@ export class SocketService {
           console.log("Did not receive a valid action.");
       }
       if (message) {
-        console.log("Sending with custom..." + message);
         this.messages.next(message);
       } else {
         console.log("message not valid, did not send.");
