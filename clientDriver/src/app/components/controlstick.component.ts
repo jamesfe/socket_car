@@ -23,6 +23,18 @@ export class ControlStickComponent {
         "message": item.message };
       this.items.push(newMessage);
     }
+    if (item.health_check !== undefined) {
+      let newMessage = {
+        "type": "health check",
+        "message": JSON.stringify(item.health_check)
+      };
+      this.items.push(newMessage);
+    }
+
+    /* TODO: Move this code somewhere better. */
+    if (this.items.length > 20) {
+      this.items = this.items.slice(this.items.length - 20, this.items.length);
+    }
     // TODO: Get template to update.
   }
 
