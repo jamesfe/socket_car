@@ -5,18 +5,18 @@
 
 import logging
 import time
+
+import coloredlogs
+
+logger = logging.getLogger('car_state')
+coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DEBUG', logger=logger)
+
 try:
     from dual_mc33926_rpi import motors, MAX_SPEED
 except ImportError:
     MAX_SPEED = 480
     NO_PWM = True
-    print('Could not import PWM library')
-
-import coloredlogs
-
-
-logger = logging.getLogger('car_state')
-coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DEBUG', logger=logger)
+    logger.error('Could not import PWM library')
 
 
 class CarState(object):
