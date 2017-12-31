@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { AppComponent } from './app.component';
+import { ClientCarMainComponent } from './ClientCarMain.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
@@ -14,12 +14,12 @@ import { ServerTrafficComponent } from './components/servertraffic.component';
         HttpModule
     ],
     declarations: [
-        AppComponent,
+        ClientCarMainComponent,
         ControlStickComponent,
         ServerTrafficComponent
     ],
     bootstrap: [
-        AppComponent
+        ClientCarMainComponent
     ]
 })
 
@@ -27,4 +27,3 @@ export class AppModule {
 
 
 }
-
