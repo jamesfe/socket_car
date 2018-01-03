@@ -5,7 +5,7 @@ import wiringpi as wi
 print('setup')
 # use 'GPIO naming'
 wi.wiringPiSetupGpio()
-num = 1
+num = 18
 # set #18 to be a PWM output
 wi.pinMode(num, wi.GPIO.PWM_OUTPUT)
 import pdb; pdb.set_trace()
@@ -20,8 +20,11 @@ wi.pwmSetRange(2000)
 
 
 print('pulse')
-pulse = -200
-wi.pwmWrite(num, pulse)
+wi.pwmWrite(num, 500)
+time.sleep(1)
+print('rotate back')
+wi.pwmWrite(num, 1500)
+
 time.sleep(1)
 print('done')
 # wi.pwmWrite(num, pulse-200)
