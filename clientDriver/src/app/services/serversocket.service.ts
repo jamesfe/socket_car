@@ -6,7 +6,7 @@ import { Observer } from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/dom/webSocket';
 
-const DRIVER_URL = 'ws://localhost:9001/control_socket';
+const DRIVER_URL = 'ws://192.168.1.37:9001/control_socket';
 
 export interface Message {
     purpose: string,
