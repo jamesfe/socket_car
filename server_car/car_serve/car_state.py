@@ -13,6 +13,7 @@ coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DE
 
 try:
     from dual_mc33926_rpi import motors, MAX_SPEED
+    NO_PWM = False
 except ImportError:
     MAX_SPEED = 480
     NO_PWM = True
@@ -131,8 +132,10 @@ class CarState(object):
 
         # Do the actual initialization
         if self._not_initialized:
+            logger.info('initializing state, should only happen once or so')
             self.initialize_state()
-        if not NO_PWM:
+        if NO_PWM is False:
+            logger.info('speeding: L {} R {}'.format(self.left_motor, self.right_motor))
             motors.motor1.setSpeed(self.left_motor)
             motors.motor2.setSpeed(self.right_motor)
 
