@@ -13,10 +13,11 @@ coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DE
 
 try:
     from dual_mc33926_rpi import motors, MAX_SPEED
-    NO_PWM = False
+    import wiringpi
+    NO_RPI = False
 except ImportError:
     MAX_SPEED = 480
-    NO_PWM = True
+    NO_RPI = True
     logger.error('Could not import PWM library')
 
 
@@ -43,6 +44,7 @@ class CarState(object):
         self.left_motor = 0
         self.right_motor = 0
         self.update_ms = 1000
+        self.servo_gpio_pin = 18
         # Previous states are a rotating number of states
         self.max_prev_states = 2000
         self.previous_states = []
@@ -90,8 +92,14 @@ class CarState(object):
             self.right_motor = self._inc_motor(self.right_motor, val)
 
     def _turn(self, value):
-        """Seemingly stupid, maybe we will have to do something more complex here later."""
-        self.steering_servo += value
+        """Check max and min, then set value."""
+        new_steering = self.steering_servo + value
+        if new_steering > self._MAX_SERVO:
+            self.steering_servo = self._MAX_SERVO
+        elif new_steering < self._MIN_SERVO:
+            self.steering_servo = self._MIN_SERVO
+        else:
+            self.steering_servo = new_steering
 
     def turn(self, value):
         """Turn by value: negative is left, positive is right."""
@@ -109,14 +117,23 @@ class CarState(object):
         self._not_initialized = False
         self._MAX_SPEED = MAX_SPEED
         self._MIN_SPEED = self._MAX_SPEED * -1
+        self._MIN_SERVO = 50
+        self._MAX_SERVO = 250
         gears = 5
         for index in range(1, gears + 1):
             self.gear_lookup[index] = int((self._MAX_SPEED / gears) * index)
         logger.info('Setting gears: ' + str(self.gear_lookup))
 
-        if NO_PWM is False:
+        if NO_RPI is False:
+            logger.info('Setting motor speeds to zero.')
             motors.enable()
             motors.setSpeeds(0, 0)
+            logger.info('Setting up Servo PWM')
+            wiringpi.pinMode(self.servo_gpio_pin, wiringpi.GPIO.PWM_OUTPUT)
+            wiringpi.wiringPiSetupGpio()
+            wiringpi.pwmSetMode(wiringpi.GPIO.PWM_MODE_MS)
+            wiringpi.pwmSetClock(192)
+            wiringpi.pwmSetRange(2000)
 
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
@@ -130,14 +147,16 @@ class CarState(object):
             delta = len(self.previous_states) - self.max_prev_states
             self.previous_states = self.previous_states[delta:]
 
-        # Do the actual initialization
         if self._not_initialized:
             logger.info('initializing state, should only happen once or so')
             self.initialize_state()
-        if NO_PWM is False:
-            logger.info('speeding: L {} R {}'.format(self.left_motor, self.right_motor))
+
+        # If we are on the rPi, make the physical state changes
+        if NO_RPI is False:
+            logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
             motors.motor1.setSpeed(self.left_motor)
             motors.motor2.setSpeed(self.right_motor)
+            wiringpi.pwmWrite(self.servo_gpio_pin, self.steering_servo)
 
     def health_check(self):
         return {
