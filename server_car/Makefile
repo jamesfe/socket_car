@@ -13,4 +13,5 @@ test:
 
 .PHONY: run
 run:
+	pigpiod
 	python3 -m car_serve.car_serve
