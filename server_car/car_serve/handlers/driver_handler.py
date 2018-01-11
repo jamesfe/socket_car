@@ -56,6 +56,7 @@ class DriverSocketHandler(WebSocketHandler):
         except ValueError:
             self.write_error_message('turn value must be an int')
         if message['direction'] == 'left':
+            self.application.log.debug('turning {}'.format(val))
             self.application.car_state.turn(-1 * val)
         elif message['direction'] == 'right':
             self.application.car_state.turn(val)
@@ -99,7 +100,6 @@ class DriverSocketHandler(WebSocketHandler):
     def on_message(self, message):
         self.application.internal_log(message)
         self.application.log.info('Received message')
-        print('hello world')
         print('Message: \"', message, '\"')
         json_msg = {}
         try:

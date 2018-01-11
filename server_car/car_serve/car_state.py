@@ -98,11 +98,15 @@ class CarState(object):
     def _turn(self, value):
         """Check max and min, then set value."""
         new_steering = self.steering_servo + value
+        logger.debug('new_steering {}'.format(new_steering))
         if new_steering > self._MAX_SERVO:
+            logger.debug('max steering {}'.format(new_steering))
             self.steering_servo = self._MAX_SERVO
         elif new_steering < self._MIN_SERVO:
+            logger.debug('min steering {}'.format(new_steering))
             self.steering_servo = self._MIN_SERVO
         else:
+            logger.debug('no new steering')
             self.steering_servo = new_steering
 
     def turn(self, value):
@@ -121,8 +125,8 @@ class CarState(object):
         self._not_initialized = False
         self._MAX_SPEED = self.config.get('max_motor_speed', 480)
         self._MIN_SPEED = self._MAX_SPEED * -1
-        self._MIN_SERVO = 0
-        self._MAX_SERVO = self.config.get('min_servo', 0)
+        self._MIN_SERVO = self.config.get('min_servo', 0)
+        self._MAX_SERVO = self.config.get('max_servo', 100)
         self._INITIAL_SERVO = 100
         gears = 5
         for index in range(1, gears + 1):
@@ -157,10 +161,11 @@ class CarState(object):
 
         # If we are on the rPi, make the physical state changes
         if self.use_motors:
-            logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
+            logger.info('State: L {} R {}'.format(self.left_motor, self.right_motor))
             motors.motor1.setSpeed(self.left_motor)
             motors.motor2.setSpeed(self.right_motor)
         if self.use_servo:
+            logger.info('Turning Servo DIR {}'.format(self.steering_servo))
             wiringpi.softPwmWrite(self.servo_gpio_pin, self.steering_servo)
 
     def health_check(self):
