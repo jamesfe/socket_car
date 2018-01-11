@@ -45,7 +45,7 @@ class CarServer(Application):
 
         # Previous commands are going to be dumped to a file
         now = dt.datetime.fromtimestamp(time.time())
-        command_log_name = 'command_log_{}.log'.format(now.strftime("%Y_%m_%d_%H%M%S"))
+        command_log_name = 'command_log_{}.log'.format(now.strftime('%Y_%m_%d_%H%M%S'))
         self.command_log = open(os.path.join(self.log_dir, command_log_name), 'w')
         self.internal_log('Command received')
 
