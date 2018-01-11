@@ -3,7 +3,7 @@ import time
 
 import pigpio
 
-servos = 18 #GPIO number
+servos = 17 #GPIO number
 
 # pigpio.start()
 it = pigpio.pi()
