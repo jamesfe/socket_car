@@ -1,0 +1,23 @@
+{
+    "logging": {
+        "log_dir": "./logs/",
+        "max_prev_states": 2000
+    },
+    "car_serve": {
+        "ip_address": "127.0.0.1",
+        "log_dir": "./logs/",
+        "port": 9001
+    },
+    "car_state": {
+        "update_ms": "1000",
+        "use_servo": false,
+        "use_motors": false,
+        "min_servo": 0,
+        "max_servo": 200,
+        "max_motor_speed": 480,
+        "zero_servo": 100,
+        "servo_gpio_pin": 17,
+        "max_previous_states": 2000
+    }
+
+}

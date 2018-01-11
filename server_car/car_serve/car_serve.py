@@ -58,15 +58,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('config', help='config file')
     args = parser.parse_args()
-    print('Reading config from {}'.format(args.config))
+    logger.warn('Reading config from {}'.format(args.config))
 
     config = {}
-    try:
-        with open(args.config, 'r') as infile:
-            config = json.loads(infile)
-    except:  # noqa
-        print('Could not find file.')
+    with open(args.config, 'r') as infile:
+        config = json.load(infile)
+
+    if config == {}:
+        sys.exit()
+
     serve_config = config.get('car_serve', {})
+    logger.warn(serve_config)
 
     app = CarServer(config)
 
@@ -74,8 +76,9 @@ def main():
         logger.info('Opening HTTP server.')
         http_server = HTTPServer(app)
         http_server.listen(serve_config.get('port', 9001), address=serve_config.get('ip_address', '127.0.0.1'))
-        logger.debug('Registering periodic callback.')
-        i = PeriodicCallback(app.car_state.update_physical_state, app.car_state.update_ms)
+        update_ms = serve_config.get('update_ms', 1000)
+        logger.debug('Registering periodic callback. Every {} ms'.format(update_ms))
+        i = PeriodicCallback(app.car_state.update_physical_state, update_mtjkjkjkjkj)
         i.start()
         IOLoop.current().start()
     except (SystemExit, KeyboardInterrupt):
