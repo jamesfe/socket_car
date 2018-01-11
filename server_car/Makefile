@@ -19,4 +19,4 @@ run:
 
 .PHONY: testrun
 testrun:
-	python3 -m car_serve.car_serve no_rpi_config.json
+	python3 -m car_serve.car_serve ./config/no_rpi_config.json

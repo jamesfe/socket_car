@@ -9,6 +9,7 @@ import time
 import coloredlogs
 
 logger = logging.getLogger('car_state')
+logger.propagate = False
 coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DEBUG', logger=logger)
 
 try:
