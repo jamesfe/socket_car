@@ -8,6 +8,8 @@ import json
 import sys
 import time
 
+import argparse
+
 import coloredlogs
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop, PeriodicCallback
@@ -53,9 +55,17 @@ class CarServer(Application):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', help='config file')
+    args = parser.parse_args()
+    print('Reading config from {}'.format(args.config))
+
     config = {}
-    with open('./config.json', 'r') as infile:
-        config = json.loads(infile)
+    try:
+        with open(args.config, 'r') as infile:
+            config = json.loads(infile)
+    except:  # noqa
+        print('Could not find file.')
     serve_config = config.get('car_serve', {})
 
     app = CarServer(config)
