@@ -135,7 +135,9 @@ class CarState(object):
             motors.setSpeeds(0, 0)
         if self.use_servo:
             logger.info('Setting up Servo Software-Based PWM')
-            wiringpi.wiringPiSetupGpio()
+            res = wiringpi.wiringPiSetupGpio()
+            if res != 0:
+                logger.error('Could not set up software PWM')
             wiringpi.softPwmCreate(self.servo_gpio_pin, 0, self._MAX_SERVO)
             wiringpi.softPwmWrite(self.servo_gpio_pin, self._INITIAL_SERVO)
 
