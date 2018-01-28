@@ -13,7 +13,6 @@ logger.propagate = False
 coloredlogs.install(format='%(asctime)s - %(levelname)s: %(message)s', level='DEBUG', logger=logger)
 
 try:
-    from dual_mc33926_rpi import motors
     import wiringpi
 except ImportError:
     logger.error('Could not import PWM library')
@@ -56,8 +55,8 @@ class CarState(object):
         # Set up the motor configs
         self.m1conf = self.config.get('motor1', {})
         self.m2conf = self.config.get('motor2', {})
-        assert m1conf != {}
-        assert m2conf != {}
+        assert self.m1conf != {}
+        assert self.m2conf != {}
 
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""
@@ -104,11 +103,15 @@ class CarState(object):
     def _turn(self, value):
         """Check max and min, then set value."""
         new_steering = self.steering_servo + value
+        logger.debug('new_steering {}'.format(new_steering))
         if new_steering > self._MAX_SERVO:
+            logger.debug('max steering {}'.format(new_steering))
             self.steering_servo = self._MAX_SERVO
         elif new_steering < self._MIN_SERVO:
+            logger.debug('min steering {}'.format(new_steering))
             self.steering_servo = self._MIN_SERVO
         else:
+            logger.debug('no new steering')
             self.steering_servo = new_steering
 
     def turn(self, value):
@@ -127,8 +130,8 @@ class CarState(object):
         self._not_initialized = False
         self._MAX_SPEED = self.config.get('max_motor_speed', 10)
         self._MIN_SPEED = self._MAX_SPEED * -1
-        self._MIN_SERVO = 0
-        self._MAX_SERVO = self.config.get('min_servo', 0)
+        self._MIN_SERVO = self.config.get('min_servo', 0)
+        self._MAX_SERVO = self.config.get('max_servo', 100)
         self._INITIAL_SERVO = 100
         gears = 5
         for index in range(1, gears + 1):
@@ -187,6 +190,7 @@ class CarState(object):
             self.setSpeed(self.m1conf.get('pwm_pin'), self.m1conf.get('dir_pin'), self.left_motor)
             self.setSpeed(self.m2conf.get('pwm_pin'), self.m2conf.get('dir_pin'), self.right_motor)
         if self.use_servo:
+            logger.info('Turning Servo DIR {}'.format(self.steering_servo))
             wiringpi.softPwmWrite(self.servo_gpio_pin, self.steering_servo)
 
     def setSpeed(self, pwm_pin, dir_pin, speed):

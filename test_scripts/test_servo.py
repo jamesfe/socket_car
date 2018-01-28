@@ -8,7 +8,6 @@ wi.wiringPiSetupGpio()
 num = 18
 # set #18 to be a PWM output
 wi.pinMode(num, wi.GPIO.PWM_OUTPUT)
-import pdb; pdb.set_trace()
 print('pin')
 # set the PWM mode to milliseconds stype
 wi.pwmSetMode(wi.GPIO.PWM_MODE_MS)
