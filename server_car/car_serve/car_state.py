@@ -53,6 +53,12 @@ class CarState(object):
         self.max_prev_states = config.get('max_prev_states', 2000)
         self.previous_states = []
 
+        # Set up the motor configs
+        self.m1conf = self.config.get('motor1', {})
+        self.m2conf = self.config.get('motor2', {})
+        assert m1conf != {}
+        assert m2conf != {}
+
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""
         return self.get_valid_speed(begin + val)
@@ -119,7 +125,7 @@ class CarState(object):
 
     def initialize_state(self):
         self._not_initialized = False
-        self._MAX_SPEED = self.config.get('max_motor_speed', 480)
+        self._MAX_SPEED = self.config.get('max_motor_speed', 10)
         self._MIN_SPEED = self._MAX_SPEED * -1
         self._MIN_SERVO = 0
         self._MAX_SERVO = self.config.get('min_servo', 0)
@@ -129,17 +135,35 @@ class CarState(object):
             self.gear_lookup[index] = int((self._MAX_SPEED / gears) * index)
         logger.info('Setting gears: ' + str(self.gear_lookup))
 
-        if self.use_motors:
-            logger.info('Setting motor speeds to zero.')
-            motors.enable()
-            motors.setSpeeds(0, 0)
-        if self.use_servo:
-            logger.info('Setting up Servo Software-Based PWM')
+        if self.use_motors or self.use_servo:
             res = wiringpi.wiringPiSetupGpio()
             if res != 0:
                 logger.error('Could not set up software PWM')
-            wiringpi.softPwmCreate(self.servo_gpio_pin, 0, self._MAX_SERVO)
-            wiringpi.softPwmWrite(self.servo_gpio_pin, self._INITIAL_SERVO)
+        if self.use_motors:
+            logger.info('Setting up Motor Software-Based PWM')
+            # a cluster of horrible looking code, should be refactored but is it single use???
+            wiringpi.pinMode(self.m1conf.get('en_pin'), wiringpi.GPIO.OUTPUT)
+            wiringpi.pinMode(self.m1conf.get('dir_pin'), wiringpi.GPIO.OUTPUT)
+            wiringpi.pinMode(self.m2conf.get('en_pin'), wiringpi.GPIO.OUTPUT)
+            wiringpi.pinMode(self.m2conf.get('dir_pin'), wiringpi.GPIO.OUTPUT)
+            logger.info('Pull both motors out of low-power mode')
+            wiringpi.digitalWrite(self.m1conf.get('en_pin'), 1)
+            wiringpi.digitalWrite(self.m2conf.get('en_pin'), 1)
+            logger.info('Set up motor software pwm')
+            wiringpi.softPwmCreate(self.m1conf.get('pwm_pin'), 0, self._MAX_SPEED)
+            wiringpi.softPwmCreate(self.m2conf.get('pwm_pin'), 0, self._MAX_SPEED)
+            wiringpi.softPwmWrite(self.m1conf.get('pwm_pin'), 0)
+            wiringpi.softPwmWrite(self.m2conf.get('pwm_pin'), 0)
+            logger.info('Setting motor speeds to zero.')
+        if self.use_servo:
+            logger.info('Setting up Servo Hardware-Based PWM')
+            wiringpi.pinMode(self.servo_gpio_pin, wiringpi.GPIO.PWM_OUTPUT)
+            wiringpi.pwmSetMode(wiringpi.GPIO.PWM_MODE_MS)
+            wiringpi.pwmSetClock(192)   # TODO: CONFIRM
+            wiringpi.pwmSetRange(2000)  # TODO: CONFIRM
+            logger.info('Servo config done')
+            wiringpi.pwmWrite(self.servo_gpio_pin, 0)
+            logger.info('Setting servo speed to zero.')
 
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
@@ -160,10 +184,24 @@ class CarState(object):
         # If we are on the rPi, make the physical state changes
         if self.use_motors:
             logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
-            motors.motor1.setSpeed(self.left_motor)
-            motors.motor2.setSpeed(self.right_motor)
+            self.setSpeed(self.m1conf.get('pwm_pin'), self.m1conf.get('dir_pin'), self.left_motor)
+            self.setSpeed(self.m2conf.get('pwm_pin'), self.m2conf.get('dir_pin'), self.right_motor)
         if self.use_servo:
             wiringpi.softPwmWrite(self.servo_gpio_pin, self.steering_servo)
+
+    def setSpeed(self, pwm_pin, dir_pin, speed):
+        """Set the motor PWM & dir based on pins and speed.
+        From the mc33926 library. Thanks, Pololu. """
+        if speed < 0:
+            speed = -speed
+            dir_value = 1
+        else:
+            dir_value = 0
+        if speed > self._MAX_SPEED:
+            speed = self._MAX_SPEED
+
+        wiringpi.digitalWrite(dir_pin, dir_value)
+        wiringpi.softPwmWrite(pwm_pin, speed)
 
     def health_check(self):
         return {
