@@ -16,7 +16,7 @@
         "max_servo": 200,
         "max_motor_speed": 480,
         "zero_servo": 100,
-        "servo_gpio_pin": 17,
+        "servo_gpio_pin": 19,
         "max_previous_states": 2000,
         "motor1": {
             "pwm_pin": 12,
