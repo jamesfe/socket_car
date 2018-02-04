@@ -12,10 +12,10 @@
     "car_state": {
         "use_servo": true,
         "use_motors": true,
-        "min_servo": 0,
+        "min_servo": 100,
         "max_servo": 200,
         "max_motor_speed": 480,
-        "zero_servo": 100,
+        "zero_servo": 150,
         "servo_gpio_pin": 17,
         "max_previous_states": 2000
     }
