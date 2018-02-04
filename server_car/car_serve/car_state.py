@@ -184,14 +184,14 @@ class CarState(object):
             logger.info('initializing state, should only happen once or so')
             self.initialize_state()
 
+        logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
         # If we are on the rPi, make the physical state changes
         if self.use_motors:
-            logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
             self.setSpeed(self.m1conf.get('pwm_pin'), self.m1conf.get('dir_pin'), self.left_motor)
             self.setSpeed(self.m2conf.get('pwm_pin'), self.m2conf.get('dir_pin'), self.right_motor)
         if self.use_servo:
             logger.info('Turning Servo DIR {}'.format(self.steering_servo))
-            wiringpi.softPwmWrite(self.servo_gpio_pin, self.steering_servo)
+            wiringpi.pwmWrite(self.servo_gpio_pin, self.steering_servo)
 
     def setSpeed(self, pwm_pin, dir_pin, speed):
         """Set the motor PWM & dir based on pins and speed.
