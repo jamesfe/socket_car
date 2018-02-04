@@ -21,11 +21,30 @@ export class ClientCarMainComponent implements OnInit {
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
-        /* We capture all the keypresses so the app can control the car when the screen is 
+        /* We capture all the keypresses so the app can control the car when the screen is
         in focus. */
-        let validKeys = "basdfqwz12345";
+        let validKeys = "bsfqwz12345";
         if (validKeys.indexOf(event.key) !== -1) {
             this.controlService.sendMessageBasedOnEvent(event.key);
+        }
+    }
+
+    @HostListener('document:keydown', ['$event'])
+    handleKeyDown(event: KeyboardEvent) {
+        /* We only send turn messages while the key is held down, after that it
+        raises to send the car in a straight line again. (handleKeyUp resets) */
+        let validKeys = "ad";
+        if (validKeys.indexOf(event.key) !== -1) {
+            this.controlService.sendMessageBasedOnEvent(event.key);
+        }
+    }
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyUp(event: KeyboardEvent) {
+        /* If the user lets go of a turning key, we send a message to zero the servo. */
+        let validKeys = "ad";
+        if (validKeys.indexOf(event.key) !== -1) {
+            this.controlService.sendMessageBasedOnEvent('â');
         }
     }
 

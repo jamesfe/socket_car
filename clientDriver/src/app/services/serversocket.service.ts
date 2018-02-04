@@ -71,11 +71,11 @@ export class SocketService {
           break;
         case "left":
         case "a":
-          message = {purpose: "turn", direction: "left", value: this.turnval}
+          message = {purpose: "turn", direction: "left", value: 90}
           break;
         case "right":
         case "d":
-          message = {purpose: "turn", direction: "right", value: this.turnval}
+          message = {purpose: "turn", direction: "right", value: 230}
           break;
         case "incspeed":
         case "w":
@@ -93,12 +93,15 @@ export class SocketService {
         case "q":
           message = {purpose: "stop"}
           break;
+        case "â": 
+          message = {purpose: "turn", direction: "right", value: 0}
         case "1":
         case "2":
         case "3":
         case "4":
         case "5":
             message = {purpose: "shift", value: parseInt(event.toString())}
+            break;
         default:
           console.log("Did not receive a valid action.");
       }
