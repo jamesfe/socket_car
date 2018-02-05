@@ -5,7 +5,6 @@
 
 import logging
 import time
-
 import coloredlogs
 
 logger = logging.getLogger('car_state')
@@ -35,6 +34,7 @@ class CarState(object):
         return value
 
     def __init__(self, config):
+        """Lots of config stuff, but it seems necessary."""
         self.config = config
         self.gear_lookup = {}
         self._not_initialized = True
