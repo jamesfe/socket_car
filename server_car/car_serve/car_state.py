@@ -78,11 +78,8 @@ class CarState(object):
         """Zero out the right motor."""
         self.right_motor = 0
 
-    def _zero_steering(self):
-        self.steering_servo = 0
-
     def zero_steering(self):
-        self._zero_steering()
+        self.steering_servo = self.ZERO_SERVO
 
     def shift_gear(self, value):
         """A shortcut to a given speed so we don't have to accelerate all the time."""
@@ -101,22 +98,32 @@ class CarState(object):
             self.right_motor = self._inc_motor(self.right_motor, val)
 
     def _turn(self, value):
-        """Check max and min, then set value."""
-        new_steering = self.steering_servo + value
+        """Given a literal servo-compatible value (from 90 to 230 for example), we want to set the value for the
+        steering servo to this value.  This is not an increment/decrement situation."""
+        new_steering = value
         logger.debug('new_steering {}'.format(new_steering))
         if new_steering > self.MAX_SERVO:
-            logger.debug('max steering {}'.format(new_steering))
+            logger.debug('input value exceeded max steering {}'.format(new_steering))
             self.steering_servo = self.MAX_SERVO
         elif new_steering < self.MIN_SERVO:
-            logger.debug('min steering {}'.format(new_steering))
+            logger.debug('input value exceeded min steering {}'.format(new_steering))
             self.steering_servo = self.MIN_SERVO
         else:
-            logger.debug('no new steering')
+            logger.debug('setting steering value to {}'.format(new_steering))
             self.steering_servo = new_steering
 
     def turn(self, value):
-        """Turn by value: negative is left, positive is right."""
-        self._turn(value)
+        """Takes a value from -50 to 50 and converts it to the right range for a full turn."""
+        min_input = -50
+        max_input = 50
+        if value < min_input:
+            value = min_input
+        elif value > max_input:
+            value = max_input
+        full_range = abs(self.MIN_SERVO) + abs(self.MAX_SERVO)
+        value += 50  # Zero to 100, a percent of sorts.
+        ranged_value = int((value / 100.0) * full_range)
+        self._turn(ranged_value)
 
     def zero_both_motors(self):
         self._zero_left()
