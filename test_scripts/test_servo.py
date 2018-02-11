@@ -17,7 +17,7 @@ print('clock')
 wi.pwmSetClock(192)
 wi.pwmSetRange(2000)
 
-
+"""
 print('pulse')
 wi.pwmWrite(num, 500)
 time.sleep(1)
@@ -26,4 +26,18 @@ wi.pwmWrite(num, 1500)
 
 time.sleep(1)
 print('done')
+"""
+
+while True:
+    for x in range(70, 220, 10):
+        print("To X: ", x)
+        wi.pwmWrite(num, x)
+        time.sleep(.1)
+
+    for x in range(220, 70, -10):
+        print("To X: ", x)
+        wi.pwmWrite(num, x)
+        time.sleep(.1)
+
+
 # wi.pwmWrite(num, pulse-200)

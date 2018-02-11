@@ -2,9 +2,10 @@
 import time
 import wiringpi
 
-num = 18
+num = 19
 # use 'GPIO naming'
-wiringpi.wiringPiSetupGpio()
+res = wiringpi.wiringPiSetupGpio()
+print('setup res: ', res)
 
 # set #num to be a PWM output
 wiringpi.pinMode(num, wiringpi.GPIO.PWM_OUTPUT)
