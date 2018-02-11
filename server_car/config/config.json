@@ -6,18 +6,27 @@
     "car_serve": {
         "ip_address": "192.168.1.37",
         "log_dir": "./logs/",
-        "port": 9001,
-        "update_ms": 1000
+        "port": 9001
     },
     "car_state": {
+        "update_ms": "1000",
         "use_servo": true,
         "use_motors": true,
         "min_servo": 0,
         "max_servo": 200,
         "max_motor_speed": 480,
         "zero_servo": 100,
-        "servo_gpio_pin": 17,
-        "max_previous_states": 2000
+        "servo_gpio_pin": 18,
+        "max_previous_states": 2000,
+        "motor1": {
+            "pwm_pin": 12,
+            "dir_pin": 24,
+            "en_pin": 22
+        },
+        "motor2": {
+            "pwm_pin": 13,
+            "dir_pin": 25,
+            "en_pin": 23
+        }
     }
-
 }
