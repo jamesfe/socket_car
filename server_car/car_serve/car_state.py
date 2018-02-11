@@ -191,7 +191,7 @@ class CarState(object):
             self.setSpeed(self.m1conf.get('pwm_pin'), self.m1conf.get('dir_pin'), self.left_motor)
             self.setSpeed(self.m2conf.get('pwm_pin'), self.m2conf.get('dir_pin'), self.right_motor)
         if self.use_servo:
-            logger.info('Turning Servo DIR {}'.format(self.steering_servo))
+            logger.info('Turning Servo DIR {} PIN {}'.format(self.steering_servo, self.servo_gpio_pin))
             wiringpi.pwmWrite(self.servo_gpio_pin, self.steering_servo)
 
     def setSpeed(self, pwm_pin, dir_pin, speed):
