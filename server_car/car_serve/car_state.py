@@ -104,12 +104,12 @@ class CarState(object):
         """Check max and min, then set value."""
         new_steering = self.steering_servo + value
         logger.debug('new_steering {}'.format(new_steering))
-        if new_steering > self._MAX_SERVO:
+        if new_steering > self.MAX_SERVO:
             logger.debug('max steering {}'.format(new_steering))
-            self.steering_servo = self._MAX_SERVO
-        elif new_steering < self._MIN_SERVO:
+            self.steering_servo = self.MAX_SERVO
+        elif new_steering < self.MIN_SERVO:
             logger.debug('min steering {}'.format(new_steering))
-            self.steering_servo = self._MIN_SERVO
+            self.steering_servo = self.MIN_SERVO
         else:
             logger.debug('no new steering')
             self.steering_servo = new_steering
@@ -130,8 +130,9 @@ class CarState(object):
         self._not_initialized = False
         self._MAX_SPEED = self.config.get('max_motor_speed', 10)
         self._MIN_SPEED = self._MAX_SPEED * -1
-        self._MIN_SERVO = self.config.get('min_servo', 0)
-        self._MAX_SERVO = self.config.get('max_servo', 100)
+        self.MIN_SERVO = self.config.get('min_servo', 100)
+        self.MAX_SERVO = self.config.get('max_servo', 100)
+        self.ZERO_SERVO = self.config.get('zero-servo', 150)
         self._INITIAL_SERVO = 100
         gears = 5
         for index in range(1, gears + 1):
@@ -162,10 +163,10 @@ class CarState(object):
             logger.info('Setting up Servo Hardware-Based PWM')
             wiringpi.pinMode(self.servo_gpio_pin, wiringpi.GPIO.PWM_OUTPUT)
             wiringpi.pwmSetMode(wiringpi.GPIO.PWM_MODE_MS)
-            wiringpi.pwmSetClock(192)   # TODO: CONFIRM
-            wiringpi.pwmSetRange(2000)  # TODO: CONFIRM
+            wiringpi.pwmSetClock(192)
+            wiringpi.pwmSetRange(2000)
             logger.info('Servo config done')
-            wiringpi.pwmWrite(self.servo_gpio_pin, 0)
+            wiringpi.pwmWrite(self.servo_gpio_pin, self.ZERO_SERVO)
             logger.info('Setting servo speed to zero.')
 
     def update_physical_state(self):
@@ -184,14 +185,14 @@ class CarState(object):
             logger.info('initializing state, should only happen once or so')
             self.initialize_state()
 
+        logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
         # If we are on the rPi, make the physical state changes
         if self.use_motors:
-            logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
             self.setSpeed(self.m1conf.get('pwm_pin'), self.m1conf.get('dir_pin'), self.left_motor)
             self.setSpeed(self.m2conf.get('pwm_pin'), self.m2conf.get('dir_pin'), self.right_motor)
         if self.use_servo:
-            logger.info('Turning Servo DIR {}'.format(self.steering_servo))
-            wiringpi.softPwmWrite(self.servo_gpio_pin, self.steering_servo)
+            logger.info('Turning Servo DIR {} PIN {}'.format(self.steering_servo, self.servo_gpio_pin))
+            wiringpi.pwmWrite(self.servo_gpio_pin, self.steering_servo)
 
     def setSpeed(self, pwm_pin, dir_pin, speed):
         """Set the motor PWM & dir based on pins and speed.
