@@ -42,24 +42,23 @@ class DriverSocketHandler(WebSocketHandler):
         return self.application.car_state.health_check()
 
     def handle_turns(self, message):
-        if not self.check_required_fields(['value', 'direction'], message):
+        """
+            A turn message looks like this:
+            { "purpose": "turn",
+                "value": 230 }
+            We are setting the absolute value of the servo with this.
+        """
+        if not self.check_required_fields(['value'], message):
             # If we return false, junk it.
             return
-
-        # Check direction
-        if message['direction'] not in ['left', 'right']:
-            self.write_error_message('turn direction must be left or right')
 
         # Check turn value.
         try:
             val = int(message['value'])
         except ValueError:
             self.write_error_message('turn value must be an int')
-        if message['direction'] == 'left':
-            self.application.log.debug('turning {}'.format(val))
-            self.application.car_state.turn(-1 * val)
-        elif message['direction'] == 'right':
-            self.application.car_state.turn(val)
+        self.application.log.debug('turning {}'.format(val))
+        self.application.car_state.turn(val)
         self.application.log.debug('sending turn health check')
         self.write_message(self.get_car_state())
 

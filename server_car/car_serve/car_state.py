@@ -103,20 +103,18 @@ class CarState(object):
 
     def _turn(self, value):
         """Check max and min, then set value."""
-        new_steering = self.steering_servo + value
-        logger.debug('new_steering {}'.format(new_steering))
-        if new_steering > self.MAX_SERVO:
-            logger.debug('max steering {}'.format(new_steering))
+        logger.debug('new_steering {}'.format(value))
+        if value > self.MAX_SERVO:
+            logger.debug('max steering {}'.format(value))
             self.steering_servo = self.MAX_SERVO
-        elif new_steering < self.MIN_SERVO:
-            logger.debug('min steering {}'.format(new_steering))
+        elif value < self.MIN_SERVO:
+            logger.debug('min steering {}'.format(value))
             self.steering_servo = self.MIN_SERVO
         else:
             logger.debug('no new steering')
-            self.steering_servo = new_steering
+            self.steering_servo = value
 
     def turn(self, value):
-        """Turn by value: negative is left, positive is right."""
         self._turn(value)
 
     def zero_both_motors(self):
