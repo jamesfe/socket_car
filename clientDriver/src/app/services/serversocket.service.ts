@@ -7,10 +7,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/dom/webSocket';
 
 const DRIVER_URL = 'ws://192.168.1.37:9001/control_socket';
+// const DRIVER_URL = 'ws://127.0.0.1:9001/control_socket';
 
 export interface Message {
     purpose: string,
-	direction?: string,
     value?: number,
     left?: boolean,
     right?: boolean,
@@ -39,7 +39,6 @@ export class SocketService {
                 let data = JSON.parse(response.data);
                 let p = {
                     purpose : data.purpose,
-                    direction: data.direction,
                     value: data.value,
                     left: data.left,
                     right: data.right,
@@ -71,11 +70,11 @@ export class SocketService {
           break;
         case "left":
         case "a":
-          message = {purpose: "turn", direction: "left", value: 90}
+          message = {purpose: "turn", value: 90}
           break;
         case "right":
         case "d":
-          message = {purpose: "turn", direction: "right", value: 230}
+          message = {purpose: "turn", value: 230}
           break;
         case "incspeed":
         case "w":
@@ -93,8 +92,9 @@ export class SocketService {
         case "q":
           message = {purpose: "stop"}
           break;
-        case "â": 
-          message = {purpose: "turn", direction: "right", value: 0}
+        case "â":
+          message = {purpose: "turn", value: 0}
+          break;
         case "1":
         case "2":
         case "3":

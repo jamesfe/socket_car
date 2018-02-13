@@ -44,7 +44,7 @@ export class ClientCarMainComponent implements OnInit {
         /* If the user lets go of a turning key, we send a message to zero the servo. */
         let validKeys = "ad";
         if (validKeys.indexOf(event.key) !== -1) {
-            this.controlService.sendMessageBasedOnEvent('â');
+            this.controlService.sendMessageBasedOnEvent('â'); // funny characters, haha
         }
     }
 
