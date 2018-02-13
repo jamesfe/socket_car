@@ -55,8 +55,9 @@ class CarState(object):
         # Set up the motor configs
         self.m1conf = self.config.get('motor1', {})
         self.m2conf = self.config.get('motor2', {})
-        assert self.m1conf != {}
-        assert self.m2conf != {}
+        if not self.config.get('debug', False):
+            assert self.m1conf != {}
+            assert self.m2conf != {}
 
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""

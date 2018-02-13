@@ -9,6 +9,7 @@
         "port": 9001
     },
     "car_state": {
+        "debug": true,
         "update_ms": "1000",
         "use_servo": false,
         "use_motors": false,
