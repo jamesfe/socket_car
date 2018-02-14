@@ -51,6 +51,7 @@ class CarState(object):
         # Previous states are a rotating number of states
         self.max_prev_states = config.get('max_prev_states', 2000)
         self.previous_states = []
+        self.previous_physical_state = {}
 
         # Set up the motor configs
         self.m1conf = self.config.get('motor1', {})
@@ -168,6 +169,13 @@ class CarState(object):
             wiringpi.pwmWrite(self.servo_gpio_pin, self.ZERO_SERVO)
             logger.info('Setting servo speed to zero.')
 
+    def same_physical_state(self):
+        """ Check the previous physical state to see if it is the same as the current one. """
+        servo = (self.steering_servo == self.previous_physical_state.get('steering', -100))
+        left = (self.left_motor == self.previous_physical_state.get('left_motor', -100))
+        right = (self.right_motor == self.previous_physical_state.get('right_motor', -100))
+        return (servo and left and right)
+
     def update_physical_state(self):
         """Send the right values to the GPIO pins."""
         # Do some note taking
@@ -183,15 +191,16 @@ class CarState(object):
         if self._not_initialized:
             logger.info('initializing state, should only happen once or so')
             self.initialize_state()
-
-        logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
-        # If we are on the rPi, make the physical state changes
-        if self.use_motors:
-            self.setSpeed(self.m1conf.get('pwm_pin'), self.m1conf.get('dir_pin'), self.left_motor)
-            self.setSpeed(self.m2conf.get('pwm_pin'), self.m2conf.get('dir_pin'), self.right_motor)
-        if self.use_servo:
-            logger.info('Turning Servo DIR {} PIN {}'.format(self.steering_servo, self.servo_gpio_pin))
-            wiringpi.pwmWrite(self.servo_gpio_pin, self.steering_servo)
+        if not self.same_physical_state():
+            logger.info('State: L {} R {} DIR {}'.format(self.left_motor, self.right_motor, self.steering_servo))
+            # If we are on the rPi, make the physical state changes
+            if self.use_motors:
+                self.setSpeed(self.m1conf.get('pwm_pin'), self.m1conf.get('dir_pin'), self.left_motor)
+                self.setSpeed(self.m2conf.get('pwm_pin'), self.m2conf.get('dir_pin'), self.right_motor)
+            if self.use_servo:
+                logger.info('Turning Servo DIR {} PIN {}'.format(self.steering_servo, self.servo_gpio_pin))
+                wiringpi.pwmWrite(self.servo_gpio_pin, self.steering_servo)
+        self.previous_physical_state = self.health_check().get('health_check', {})
 
     def setSpeed(self, pwm_pin, dir_pin, speed):
         """Set the motor PWM & dir based on pins and speed.
