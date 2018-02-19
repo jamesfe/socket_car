@@ -10,11 +10,11 @@
     },
     "car_state": {
         "debug": false,
-        "update_ms": "1000",
+        "update_ms": 100,
         "use_servo": true,
         "use_motors": true,
-        "min_servo": 90,
-        "max_servo": 230,
+        "min_servo": 120,
+        "max_servo": 190,
         "max_motor_speed": 480,
         "servo_gpio_pin": 18,
         "max_previous_states": 2000,
@@ -28,7 +28,7 @@
             "dir_pin": 25,
             "en_pin": 23
         },
-        "zero_servo": 150,
+        "zero_servo": 155,
         "max_previous_states": 2000
     }
 }
