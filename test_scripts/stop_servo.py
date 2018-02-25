@@ -8,7 +8,7 @@ wi.wiringPiSetupGpio()
 
 
 # num = 18
-num = 12
+num = 18
 # set #18 to be a PWM output
 wi.pinMode(num, wi.GPIO.PWM_OUTPUT)
 print('pin')

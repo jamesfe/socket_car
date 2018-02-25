@@ -24,7 +24,7 @@
             "en_pin": 22
         },
         "motor2": {
-            "pwm_pin": 13,
+            "pwm_pin": 12,
             "dir_pin": 25,
             "en_pin": 23
         },
