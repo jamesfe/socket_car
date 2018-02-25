@@ -23,7 +23,7 @@ from car_serve.handlers import (
 )
 
 logger = logging.getLogger('car_server')
-coloredlogs.install(format='%(asctime)s,%(msecs)03d - %(levelname)s: %(message)s', level='DEBUG', logger=logger)
+coloredlogs.install(format='%(asctime)s,%(msecs)03d - %(levelname)s: %(message)s', level='DEBUG', logger=logger, milliseconds=True)
 # TODO: Maybe add log_function here?
 
 
