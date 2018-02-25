@@ -4,8 +4,7 @@ import wiringpi as wi
 
 print('setup')
 # use 'GPIO naming'
-x = wi.wiringPiSetupGpio()
-print('Return results: {}'.format(x))
+wi.wiringPiSetupGpio()
 
 
 # num = 18
@@ -32,17 +31,4 @@ time.sleep(1)
 print('done')
 """
 
-wi.pwmWrite(num, 100)
-
-while True:
-    for x in range(70, 220, 10):
-        print("To X: ", x)
-        wi.pwmWrite(num, x)
-        time.sleep(.1)
-
-    for x in range(220, 70, -10):
-        print("To X: ", x)
-        wi.pwmWrite(num, x)
-        time.sleep(.1)
-
-# wi.pwmWrite(num, pulse-200)
+wi.pwmWrite(num, 0)
