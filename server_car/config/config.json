@@ -6,11 +6,11 @@
     "car_serve": {
         "ip_address": "192.168.1.37",
         "log_dir": "./logs/",
-        "port": 9001
+        "port": 9001,
+        "update_ms": 100
     },
     "car_state": {
         "debug": false,
-        "update_ms": 100,
         "use_servo": true,
         "use_motors": true,
         "min_servo": 120,

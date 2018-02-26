@@ -76,7 +76,7 @@ def main():
         logger.info('Opening HTTP server.')
         http_server = HTTPServer(app)
         http_server.listen(serve_config.get('port', 9001), address=serve_config.get('ip_address', '127.0.0.1'))
-        update_ms = serve_config.get('update_ms', 1000)
+        update_ms = serve_config.get('update_ms', 100)
         logger.debug('Registering periodic callback. Every {} ms'.format(update_ms))
         i = PeriodicCallback(app.car_state.update_physical_state, update_ms)
         i.start()
