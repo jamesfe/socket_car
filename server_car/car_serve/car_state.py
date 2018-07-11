@@ -60,6 +60,8 @@ class CarState(object):
             assert self.m1conf != {}
             assert self.m2conf != {}
 
+        self.initialize_state()
+
     def _inc_motor(self, begin, val):
         """A helper function we can change later to modify how values are calculated."""
         return self.get_valid_speed(begin + val)

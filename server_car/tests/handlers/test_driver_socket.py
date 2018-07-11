@@ -8,11 +8,15 @@ from tornado.websocket import websocket_connect
 from car_serve.car_serve import CarServer
 
 
-def generate_turn_message(val, direction):
+def get_config(infile):
+    with open(infile, 'r') as cfile:
+        return json.load(cfile)
+
+
+def generate_turn_message(val):
     return json.dumps({
         'purpose': 'turn',
-        'value': val,
-        'direction': direction
+        'value': val
     })
 
 
@@ -43,7 +47,8 @@ class TestDriverSocket(AsyncHTTPTestCase):
     test_url = 'ws://localhost:%d/control_socket'
 
     def get_app(self):
-        self.test_app = CarServer(ioloop=self.io_loop)
+        config = get_config('./tests/test_config/config.json')
+        self.test_app = CarServer(config, ioloop=self.io_loop)
         return self.test_app
 
     @gen_test
@@ -86,7 +91,7 @@ class TestDriverSocket(AsyncHTTPTestCase):
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
             io_loop=self.io_loop)
-        ws.write_message(generate_turn_message(5, 'left'))
+        ws.write_message(generate_turn_message(5))
         response = yield ws.read_message()
         self.assertIsNotNone(response)
         res = json.loads(response)
