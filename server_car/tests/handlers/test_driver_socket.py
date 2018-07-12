@@ -62,7 +62,8 @@ class TestDriverSocket(AsyncHTTPTestCase):
         res = json.loads(response)
         self.assertIsInstance(res, dict)
         msg = {'type': 'error', 'message': 'not json'}
-        self.assertDictEqual(res, msg)
+        for k, v in msg.items():
+            self.assertEqual(res[k], v)
 
     @gen_test
     def test_messages_are_received_and_replied_to(self):
@@ -84,7 +85,8 @@ class TestDriverSocket(AsyncHTTPTestCase):
         res = json.loads(response)
         self.assertIsInstance(res, dict)
         msg = {'type': 'error', 'message': 'no purpose'}
-        self.assertDictEqual(res, msg)
+        for k, v in msg.items():
+            self.assertEqual(res[k], v)
 
     @gen_test
     def test_turning_turns_the_vehicle(self):
@@ -97,7 +99,7 @@ class TestDriverSocket(AsyncHTTPTestCase):
         res = json.loads(response)
         self.assertIsInstance(res, dict)
         car_state = self.test_app.car_state
-        self.assertEqual(car_state.steering_servo, -5)
+        self.assertEqual(car_state.steering_servo, 5)
 
     @gen_test
     def test_zero_all_stops_everything(self):
