@@ -57,10 +57,14 @@ class DriverSocketHandler(WebSocketHandler):
             val = int(message['value'])
         except ValueError:
             self.write_error_message('turn value must be an int')
-        self.application.log.debug('turning {}'.format(val))
-        self.application.car_state.turn(val)
-        self.application.log.debug('sending turn health check')
-        self.write_message(self.get_car_state())
+            val = None
+        if val is not None and val == message['value']:
+            self.application.log.debug('turning {}'.format(val))
+            self.application.car_state.turn(val)
+            self.application.log.debug('sending turn health check')
+            self.write_message(self.get_car_state())
+        else:
+            self.write_error_message('turn value must be an int')
 
     def handle_speed(self, message):
         if not self.check_required_fields(['value', 'left', 'right'], message):
@@ -89,7 +93,7 @@ class DriverSocketHandler(WebSocketHandler):
 
     def handle_shift(self, message):
         """If we shift to a certain gear, set the car's speed to that gear immediately."""
-        if 'value' not in message:
+        if 'value' not in message or message['value'] not in range(1, 7):
             self.write_error_message('must contain a value from 1-6')
             return None
         target_gear = int(message['value'])

@@ -32,6 +32,13 @@ def generate_stop_message():
     })
 
 
+def generate_shift_message(val):
+    return json.dumps({
+        'value': val,
+        'purpose': 'shift'
+    })
+
+
 def generate_speed_inc_message(val, left=False, right=False):
     return json.dumps({
         'purpose': 'speed',
@@ -50,6 +57,19 @@ class TestDriverSocket(AsyncHTTPTestCase):
         config = get_config('./tests/test_config/config.json')
         self.test_app = CarServer(config, ioloop=self.io_loop)
         return self.test_app
+
+    @gen_test
+    def test_missing_fields_append(self):
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        msg = {'purpose': 'speed'}
+        ws.write_message(json.dumps(msg))
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        self.assertEqual(res['message'], "Missing fields: ['value', 'left', 'right']")
 
     @gen_test
     def test_non_json_messages_return_error(self):
@@ -102,6 +122,36 @@ class TestDriverSocket(AsyncHTTPTestCase):
         self.assertEqual(car_state.steering_servo, 5)
 
     @gen_test
+    def test_turns_must_be_an_int_not_a_double(self):
+        car_state = self.test_app.car_state
+        previous_turn_state = car_state.steering_servo
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        ws.write_message(generate_turn_message(0.5))
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        self.assertEqual(car_state.steering_servo, previous_turn_state)
+        self.assertEqual(res['message'], 'turn value must be an int')
+
+    @gen_test
+    def test_turns_must_be_an_int_not_a_string(self):
+        car_state = self.test_app.car_state
+        previous_turn_state = car_state.steering_servo
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        ws.write_message(generate_turn_message('left'))
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        self.assertEqual(car_state.steering_servo, previous_turn_state)
+        self.assertEqual(res['message'], 'turn value must be an int')
+
+    @gen_test
     def test_zero_all_stops_everything(self):
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
@@ -128,6 +178,42 @@ class TestDriverSocket(AsyncHTTPTestCase):
         car_state = self.test_app.car_state
         self.assertEqual(car_state.left_motor, -10)
         self.assertEqual(car_state.right_motor, 0)
+
+    @gen_test
+    def test_shifting_increases_speed(self):
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        ws.write_message(generate_shift_message(3))
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        car_state = self.test_app.car_state
+        self.assertEqual(car_state.left_motor, 288)
+        self.assertEqual(car_state.right_motor, 288)
+
+    @gen_test
+    def check_malformed_message(self, message, err_msg):
+        car_state = self.test_app.car_state
+        prev_state = car_state.health_check()
+        del prev_state['time']
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        ws.write_message(message)
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        curr_state = car_state.health_check()
+        del curr_state['time']
+        self.assertDictEqual(curr_state, prev_state)
+        self.assertEqual(res['message'], err_msg)
+
+    def test_failing_shift_messages(self):
+        self.check_malformed_message(generate_shift_message('hello'), 'must contain a value from 1-6')
+        self.check_malformed_message(generate_shift_message(7), 'must contain a value from 1-6')
 
     @gen_test
     def test_stop_does_stop_car(self):
