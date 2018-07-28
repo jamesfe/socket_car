@@ -2,7 +2,7 @@
 # Set up an environment for the server
 .PHONY: setuppython
 setuppython:
-	 mkdir ../localenv/
+	 mkdir -p ../localenv/
 	 python3 -m venv ../localenv/
 	 source ../localenv/bin/activate
 	 pip install -r requirements.txt
