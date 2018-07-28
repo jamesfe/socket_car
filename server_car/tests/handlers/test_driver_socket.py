@@ -59,6 +59,24 @@ class TestDriverSocket(AsyncHTTPTestCase):
         return self.test_app
 
     @gen_test
+    def check_malformed_message(self, message, err_msg):
+        car_state = self.test_app.car_state
+        prev_state = car_state.health_check()
+        del prev_state['time']
+        ws = yield websocket_connect(
+            self.test_url % self.get_http_port(),
+            io_loop=self.io_loop)
+        ws.write_message(message)
+        response = yield ws.read_message()
+        self.assertIsNotNone(response)
+        res = json.loads(response)
+        self.assertIsInstance(res, dict)
+        curr_state = car_state.health_check()
+        del curr_state['time']
+        self.assertDictEqual(curr_state, prev_state)
+        self.assertEqual(res['message'], err_msg)
+
+    @gen_test
     def test_missing_fields_append(self):
         ws = yield websocket_connect(
             self.test_url % self.get_http_port(),
@@ -71,19 +89,11 @@ class TestDriverSocket(AsyncHTTPTestCase):
         self.assertIsInstance(res, dict)
         self.assertEqual(res['message'], "Missing fields: ['value', 'left', 'right']")
 
-    @gen_test
-    def test_non_json_messages_return_error(self):
-        ws = yield websocket_connect(
-            self.test_url % self.get_http_port(),
-            io_loop=self.io_loop)
-        ws.write_message('blaggle')
-        response = yield ws.read_message()
-        self.assertIsNotNone(response)
-        res = json.loads(response)
-        self.assertIsInstance(res, dict)
-        msg = {'type': 'error', 'message': 'not json'}
-        for k, v in msg.items():
-            self.assertEqual(res[k], v)
+    def test_malformed_messages(self):
+        self.check_malformed_message('blaggle', 'not json')
+        self.check_malformed_message(json.dumps({'no': 'purpose'}), 'no purpose')
+        self.check_malformed_message(generate_turn_message(0.5), 'turn value must be an int')
+        self.check_malformed_message(generate_turn_message('hello'), 'turn value must be an int')
 
     @gen_test
     def test_messages_are_received_and_replied_to(self):
@@ -93,20 +103,6 @@ class TestDriverSocket(AsyncHTTPTestCase):
         ws.write_message(json.dumps({'blaggle': True}))
         response = yield ws.read_message()
         self.assertIsNotNone(response)
-
-    @gen_test
-    def test_messages_with_no_purpose_receive_error(self):
-        ws = yield websocket_connect(
-            self.test_url % self.get_http_port(),
-            io_loop=self.io_loop)
-        ws.write_message(json.dumps({'blaggle': 'blah'}))
-        response = yield ws.read_message()
-        self.assertIsNotNone(response)
-        res = json.loads(response)
-        self.assertIsInstance(res, dict)
-        msg = {'type': 'error', 'message': 'no purpose'}
-        for k, v in msg.items():
-            self.assertEqual(res[k], v)
 
     @gen_test
     def test_turning_turns_the_vehicle(self):
@@ -120,36 +116,6 @@ class TestDriverSocket(AsyncHTTPTestCase):
         self.assertIsInstance(res, dict)
         car_state = self.test_app.car_state
         self.assertEqual(car_state.steering_servo, 5)
-
-    @gen_test
-    def test_turns_must_be_an_int_not_a_double(self):
-        car_state = self.test_app.car_state
-        previous_turn_state = car_state.steering_servo
-        ws = yield websocket_connect(
-            self.test_url % self.get_http_port(),
-            io_loop=self.io_loop)
-        ws.write_message(generate_turn_message(0.5))
-        response = yield ws.read_message()
-        self.assertIsNotNone(response)
-        res = json.loads(response)
-        self.assertIsInstance(res, dict)
-        self.assertEqual(car_state.steering_servo, previous_turn_state)
-        self.assertEqual(res['message'], 'turn value must be an int')
-
-    @gen_test
-    def test_turns_must_be_an_int_not_a_string(self):
-        car_state = self.test_app.car_state
-        previous_turn_state = car_state.steering_servo
-        ws = yield websocket_connect(
-            self.test_url % self.get_http_port(),
-            io_loop=self.io_loop)
-        ws.write_message(generate_turn_message('left'))
-        response = yield ws.read_message()
-        self.assertIsNotNone(response)
-        res = json.loads(response)
-        self.assertIsInstance(res, dict)
-        self.assertEqual(car_state.steering_servo, previous_turn_state)
-        self.assertEqual(res['message'], 'turn value must be an int')
 
     @gen_test
     def test_zero_all_stops_everything(self):
@@ -192,24 +158,6 @@ class TestDriverSocket(AsyncHTTPTestCase):
         car_state = self.test_app.car_state
         self.assertEqual(car_state.left_motor, 288)
         self.assertEqual(car_state.right_motor, 288)
-
-    @gen_test
-    def check_malformed_message(self, message, err_msg):
-        car_state = self.test_app.car_state
-        prev_state = car_state.health_check()
-        del prev_state['time']
-        ws = yield websocket_connect(
-            self.test_url % self.get_http_port(),
-            io_loop=self.io_loop)
-        ws.write_message(message)
-        response = yield ws.read_message()
-        self.assertIsNotNone(response)
-        res = json.loads(response)
-        self.assertIsInstance(res, dict)
-        curr_state = car_state.health_check()
-        del curr_state['time']
-        self.assertDictEqual(curr_state, prev_state)
-        self.assertEqual(res['message'], err_msg)
 
     def test_failing_shift_messages(self):
         self.check_malformed_message(generate_shift_message('hello'), 'must contain a value from 1-6')

@@ -56,7 +56,6 @@ class DriverSocketHandler(WebSocketHandler):
         try:
             val = int(message['value'])
         except ValueError:
-            self.write_error_message('turn value must be an int')
             val = None
         if val is not None and val == message['value']:
             self.application.log.debug('turning {}'.format(val))
