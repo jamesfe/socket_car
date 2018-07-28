@@ -178,9 +178,7 @@ class CarState(object):
         right = (self.right_motor == self.previous_physical_state.get('right_motor', -100))
         return (servo and left and right)
 
-    def update_physical_state(self):
-        """Send the right values to the GPIO pins."""
-        # Do some note taking
+    def update_state_histories(self):
         history_unit = {
             'time': time.time(),
             'health_check': self.health_check()
@@ -189,6 +187,11 @@ class CarState(object):
         if len(self.previous_states) > self.max_prev_states:
             delta = len(self.previous_states) - self.max_prev_states
             self.previous_states = self.previous_states[delta:]
+
+    def update_physical_state(self):
+        """Send the right values to the GPIO pins."""
+        # Do some note taking
+        self.update_state_histories()
 
         if self._not_initialized:
             logger.info('initializing state, should only happen once or so')
@@ -207,13 +210,9 @@ class CarState(object):
     def setSpeed(self, pwm_pin, dir_pin, speed):
         """Set the motor PWM & dir based on pins and speed.
         From the mc33926 library. Thanks, Pololu. """
-        if speed < 0:
-            speed = -speed
-            dir_value = 1
-        else:
-            dir_value = 0
-        if speed > self._MAX_SPEED:
-            speed = self._MAX_SPEED
+        dir_value = 1 if speed < 0 else 0
+        speed = speed if speed > 0 else -speed
+        speed = self.get_valid_speed(speed)
 
         wiringpi.digitalWrite(dir_pin, dir_value)
         wiringpi.softPwmWrite(pwm_pin, speed)
