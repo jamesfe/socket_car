@@ -20,3 +20,9 @@ run:
 .PHONY: testrun
 testrun:
 	python3 -m car_serve.car_serve ./config/no_rpi_config.json
+
+
+.PHONY: coverage
+coverage:
+	coverage run --source car_serve -m unittest discover -v
+	coverage report -m
