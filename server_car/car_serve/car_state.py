@@ -215,6 +215,7 @@ class CarState(object):
         speed = self.get_valid_speed(speed)
 
         wiringpi.digitalWrite(dir_pin, dir_value)
+        # TODO: Change this to pwmWrite
         wiringpi.softPwmWrite(pwm_pin, speed)
 
     def health_check(self):
